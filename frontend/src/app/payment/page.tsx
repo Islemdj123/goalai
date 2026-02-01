@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { Check, ArrowLeft, Upload, Send, ShieldCheck, Globe } from "lucide-react";
+import { Check, ArrowLeft, Upload, Send, ShieldCheck, Globe, RefreshCw } from "lucide-react";
 
 const translations: any = {
   en: {
