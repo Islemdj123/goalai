@@ -210,11 +210,7 @@ const translations: any = {
 
 export default function Payment() {
   const router = useRouter();
-  const API_BASE = typeof window !== "undefined" 
-    ? (window.location.hostname === "localhost" 
-        ? "http://localhost:8000" 
-        : (process.env.NEXT_PUBLIC_API_URL || "/api"))
-    : "/api";
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
   const [lang, setLang] = useState<"en" | "ar" | "fr">("en");
   const [selectedPlan, setSelectedPlan] = useState<any>(null);

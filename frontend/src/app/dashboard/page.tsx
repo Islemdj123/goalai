@@ -219,11 +219,7 @@ const LiveMinute = ({ status, initialMinute }: { status: string, initialMinute: 
 
 export default function Dashboard() {
   const router = useRouter();
-  const API_BASE = typeof window !== "undefined" 
-    ? (window.location.hostname === "localhost" 
-        ? "http://localhost:8000" 
-        : (process.env.NEXT_PUBLIC_API_URL || "/api"))
-    : "/api";
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
   const [view, setView] = useState<"matches" | "profile">("matches");
   const [lang, setLang] = useState<"en" | "ar" | "fr">("en");

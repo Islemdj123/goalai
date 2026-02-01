@@ -7,11 +7,7 @@ import { useRouter } from "next/navigation";
 export default function Register() {
   const [formData, setFormData] = useState({ username: "", email: "", password: "", confirm: "" });
   const router = useRouter();
-  const API_BASE = typeof window !== "undefined" 
-    ? (window.location.hostname === "localhost" 
-        ? "http://localhost:8000" 
-        : (process.env.NEXT_PUBLIC_API_URL || "/api"))
-    : "/api";
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
