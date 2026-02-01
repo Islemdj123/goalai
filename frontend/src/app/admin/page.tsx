@@ -34,7 +34,11 @@ interface Transaction {
 
 export default function AdminDashboard() {
   const router = useRouter();
-  const API_BASE = typeof window !== "undefined" && window.location.hostname === "localhost" ? "http://localhost:8000" : "/api";
+  const API_BASE = typeof window !== "undefined" 
+    ? (window.location.hostname === "localhost" 
+        ? "http://localhost:8000" 
+        : (process.env.NEXT_PUBLIC_API_URL || "/api"))
+    : "/api";
   
   const [activeTab, setActiveTab] = useState<"users" | "transactions" | "settings">("users");
   const [users, setUsers] = useState<AdminUser[]>([]);

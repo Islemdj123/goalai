@@ -8,7 +8,11 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
-  const API_BASE = typeof window !== "undefined" && window.location.hostname === "localhost" ? "http://localhost:8000" : "/api";
+  const API_BASE = typeof window !== "undefined" 
+    ? (window.location.hostname === "localhost" 
+        ? "http://localhost:8000" 
+        : (process.env.NEXT_PUBLIC_API_URL || "/api"))
+    : "/api";
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
