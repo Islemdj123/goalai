@@ -1,10 +1,7 @@
 data/
 backend/
 models/
-src/
-node_modules/
-package.json
-package-lock.json
+python_src/
 requirements.txt
 *.py
 *.pkl
@@ -24,4 +21,5 @@ copy_image.py
 dashboard.py
 debug_matches.py
 migrate_users.py
-frontend/node_modules/
+frontend/
+node_modules/
