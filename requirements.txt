@@ -2,12 +2,10 @@ pandas
 numpy
 scikit-learn
 requests
-streamlit
 fastapi
 uvicorn
 python-jose[cryptography]
 passlib[bcrypt]
-stripe
 python-multipart
 sqlalchemy
 psycopg2-binary
