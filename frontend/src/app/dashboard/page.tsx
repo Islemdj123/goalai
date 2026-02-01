@@ -221,7 +221,7 @@ export default function Dashboard() {
   const router = useRouter();
   const [view, setView] = useState<"matches" | "profile">("matches");
   const [lang, setLang] = useState<"en" | "ar" | "fr">("en");
-  const [user, setUser] = useState<{email: string, username: string, has_paid: boolean, status: string, days_left?: number, expiry_date?: string, balance?: number, is_admin?: boolean} | null>(null);
+  const [user, setUser] = useState<{email: string, username: string, has_paid: boolean, status: string, days_left?: number, expiry_date?: string, balance?: number, is_admin?: boolean, pending_amount?: number} | null>(null);
   const [matches, setMatches] = useState<Match[]>([]);
   const [liveMatches, setLiveMatches] = useState<LiveMatch[]>([]);
   const [loading, setLoading] = useState(true);
@@ -393,10 +393,10 @@ export default function Dashboard() {
                       {t.expiry}: <span className="text-white">{user.days_left}</span>
                     </p>
                   )}
-                  {user.pending_amount > 0 && (
+                  {(user?.pending_amount ?? 0) > 0 && (
                     <div className="mt-2 p-2 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
                       <p className="text-[8px] text-yellow-500 font-black uppercase tracking-widest">{t.pending}</p>
-                      <p className="text-[10px] text-white font-bold">${user.pending_amount.toFixed(2)}</p>
+                      <p className="text-[10px] text-white font-bold">${user?.pending_amount?.toFixed(2)}</p>
                     </div>
                   )}
                 </div>
