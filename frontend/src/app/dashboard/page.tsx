@@ -429,15 +429,17 @@ export default function Dashboard() {
             </div>
             <span className="hidden md:block font-medium">{t.refresh}</span>
           </button>
-        </nav>
 
-        <button 
-          onClick={handleLogout}
-          className="flex items-center gap-3 text-red-500 hover:text-red-400 mt-auto transition-colors"
-        >
-          <LogOut size={20} />
-          <span className="hidden md:block font-medium">{t.logout}</span>
-        </button>
+          <button 
+            onClick={handleLogout}
+            className="flex items-center gap-4 text-red-500 hover:text-red-400 transition-colors w-full px-2 mt-4 pt-4 border-t border-white/5"
+          >
+            <div className="p-2 rounded-lg">
+              <LogOut size={20} />
+            </div>
+            <span className="hidden md:block font-medium">{t.logout}</span>
+          </button>
+        </nav>
       </aside>
 
       {/* Main Content */}
