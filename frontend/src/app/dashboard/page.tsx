@@ -104,8 +104,8 @@ const translations: any = {
     upgrade_btn: "ترقية / تجديد",
     logout: "خروج",
     topup: "شحن الرصيد",
-    matches: "مركز التوقعات والمباريات",
-    profile: "بيانات الحساب والاشتراك",
+    matches: "التنبؤات",
+    profile: "معلومات الحساب",
     refresh: "تحديث",
     reasoning: "تحليل الذكاء الاصطناعي",
     analyzing: "جاري تحليل المباريات القادمة...",
@@ -331,13 +331,32 @@ export default function Dashboard() {
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/60" />
       </div>
 
-      {/* Mobile Menu Button */}
-      <button 
-        onClick={() => setSidebarOpen(!sidebarOpen)}
-        className="fixed top-6 right-6 z-50 p-3 bg-blue-600 rounded-2xl md:hidden shadow-lg shadow-blue-600/20"
-      >
-        {sidebarOpen ? <X className="text-white" size={24} /> : <Menu className="text-white" size={24} />}
-      </button>
+      {/* Mobile AppBar */}
+      <div className="md:hidden fixed top-0 left-0 right-0 z-50 bg-black/90 backdrop-blur-xl border-b border-white/10 px-4 py-4 flex items-center justify-between shadow-2xl">
+        <div className="text-xl font-black italic text-blue-500">GOALAI</div>
+        <div className="flex gap-2">
+          <button 
+            onClick={() => { setView("matches"); setSidebarOpen(false); }}
+            className={`flex items-center gap-2 px-3 py-2 rounded-xl text-[10px] font-black uppercase transition-all ${view === "matches" ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20" : "bg-white/5 text-white/50"}`}
+          >
+            <TrendingUp size={14} />
+            <span>{t.matches}</span>
+          </button>
+          <button 
+            onClick={() => { setView("profile"); setSidebarOpen(false); }}
+            className={`flex items-center gap-2 px-3 py-2 rounded-xl text-[10px] font-black uppercase transition-all ${view === "profile" ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20" : "bg-white/5 text-white/50"}`}
+          >
+            <User size={14} />
+            <span>{t.profile}</span>
+          </button>
+          <button 
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="p-2 bg-white/10 rounded-xl text-white/80"
+          >
+            {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
+        </div>
+      </div>
 
       {/* Sidebar Overlay */}
       {sidebarOpen && (
@@ -455,7 +474,7 @@ export default function Dashboard() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-grow p-6 md:p-10 overflow-y-auto relative z-10">
+      <main className="flex-grow p-6 md:p-10 overflow-y-auto relative z-10 pt-24 md:pt-10">
         {view === "matches" ? (
           <>
             <header className="flex justify-between items-center mb-10">
