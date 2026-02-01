@@ -1,28 +1,14 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { Volume2, VolumeX } from "lucide-react";
 
 export default function Splash() {
   const router = useRouter();
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [muted, setMuted] = useState(false);
 
   useEffect(() => {
     const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
     
-    // Attempt auto-play and add global click listener as fallback
-    const playAudio = () => {
-      if (audioRef.current) {
-        audioRef.current.play().catch(() => {
-          console.log("Autoplay still blocked");
-        });
-      }
-    };
-
-    window.addEventListener("click", playAudio, { once: true });
-
     const timer = setTimeout(() => {
       if (token) {
         router.push("/dashboard");
@@ -33,31 +19,8 @@ export default function Splash() {
     return () => clearTimeout(timer);
   }, [router]);
 
-  const toggleMute = () => {
-    if (audioRef.current) {
-      audioRef.current.muted = !audioRef.current.muted;
-      setMuted(audioRef.current.muted);
-    }
-  };
-
   return (
     <div className="relative h-screen w-screen flex items-center justify-center overflow-hidden bg-black">
-      {/* Hidden Audio Element */}
-      <audio 
-        ref={audioRef}
-        src="https://www.uefa.com/MultimediaFiles/Download/Competitions/General/02/52/65/15/2526515_WAV.mp3" 
-        autoPlay 
-        loop
-      />
-
-      {/* Audio Toggle Button */}
-      <button 
-        onClick={toggleMute}
-        className="absolute top-10 right-10 z-30 p-3 bg-white/10 backdrop-blur-md rounded-full border border-white/10 hover:bg-white/20 transition-all"
-      >
-        {muted ? <VolumeX className="text-white" size={24} /> : <Volume2 className="text-white" size={24} />}
-      </button>
-
       {/* Background Splash Wallpaper */}
       <div className="absolute inset-0 z-0">
         <img 
