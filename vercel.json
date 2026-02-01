@@ -4,10 +4,6 @@
     {
       "source": "/api/(.*)",
       "destination": "backend/main.py"
-    },
-    {
-      "source": "/data/receipts/(.*)",
-      "destination": "backend/main.py"
     }
   ],
   "builds": [
@@ -19,5 +15,6 @@
       "src": "frontend/package.json",
       "use": "@vercel/next"
     }
-  ]
+  ],
+  "outputDirectory": "frontend/.next"
 }
