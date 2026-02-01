@@ -1,0 +1,11 @@
+Home,Away,Winner Pred,W_Prob,Draw_Prob,BTTS,BTTS_Prob,Confidence
+Liverpool,AC Milan,AWAY,40.6%,19.7%,YES,67.3%,NORMAL
+Real Madrid,Inter Milan,DRAW,27.8%,46.6%,YES,61.4%,NORMAL
+PSG,Napoli,HOME,52.3%,9.7%,YES,84.1%,NORMAL
+Napoli,Real Madrid,HOME,41.1%,29.7%,YES,72.9%,NORMAL
+Inter Milan,Arsenal,AWAY,38.1%,27.3%,YES,70.2%,NORMAL
+Liverpool,Bayern Munich,HOME,55.4%,14.6%,YES,68.7%,NORMAL
+Manchester City,Inter Milan,HOME,42.4%,22.7%,YES,57.3%,NORMAL
+Arsenal,AC Milan,AWAY,36.1%,33.3%,YES,58.9%,NORMAL
+AC Milan,Real Madrid,DRAW,25.7%,55.3%,YES,79.2%,NORMAL
+Arsenal,Napoli,HOME,48.3%,12.9%,YES,71.2%,NORMAL

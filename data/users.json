@@ -1,0 +1,20 @@
+{
+    "admin@match.ai": {
+        "username": "islemdjeridi",
+        "password": "$pbkdf2-sha256$29000$zdkbQ0gJgdC613rvHWNMyQ$jirs/HErSS2i8HJ/JVRF8i.bVLxIOLQhRbeaGOkoZlk",
+        "status": "paid",
+        "has_paid": true,
+        "payment_status": "paid",
+        "txid": "ADMIN"
+    },
+    "islemdjeridi62@gmail.com": {
+        "username": "islem djeridi",
+        "password": "$pbkdf2-sha256$29000$n9NaCyEEwPi/1/p/by0lBA$73KASp2JowoVkR5uDGWLu2bhsnpcgUYeiFi39pHqxcg",
+        "has_paid": false,
+        "status": "expired",
+        "payment_status": "paid",
+        "plan": "monthly",
+        "txid": "monthly | 1532653655765",
+        "receipt_path": "data/receipts/islemdjeridi62_gmail.com_1769799523.PNG"
+    }
+}

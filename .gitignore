@@ -1,0 +1,24 @@
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+.next/
+out/
+build/
+
+# Local data
+data/receipts/*
+!data/receipts/.gitkeep
+*.db
+*.sqlite3
+
+# Environment
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+.qodo/
+.zencoder/
+.zenflow/
