@@ -12,12 +12,16 @@ export default function Splash() {
   useEffect(() => {
     const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
     
-    // Attempt auto-play
-    if (audioRef.current) {
-      audioRef.current.play().catch(() => {
-        console.log("Autoplay blocked by browser");
-      });
-    }
+    // Attempt auto-play and add global click listener as fallback
+    const playAudio = () => {
+      if (audioRef.current) {
+        audioRef.current.play().catch(() => {
+          console.log("Autoplay still blocked");
+        });
+      }
+    };
+
+    window.addEventListener("click", playAudio, { once: true });
 
     const timer = setTimeout(() => {
       if (token) {
@@ -41,7 +45,7 @@ export default function Splash() {
       {/* Hidden Audio Element */}
       <audio 
         ref={audioRef}
-        src="https://www.soundboard.com/handler/DownLoadTrack.ashx?cliptoken=646002f1-6899-4d76-8f2e-43615456f932" 
+        src="https://www.uefa.com/MultimediaFiles/Download/Competitions/General/02/52/65/15/2526515_WAV.mp3" 
         autoPlay 
         loop
       />
