@@ -396,6 +396,12 @@ export default function Dashboard() {
                 <p className="text-[10px] uppercase tracking-widest text-white/50 font-bold">{t.balance}</p>
                 <p className="text-xs font-black text-blue-500 tabular-nums">${user?.balance?.toFixed(2) || "0.00"}</p>
               </div>
+              {(user?.pending_amount || 0) > 0 && (
+                <div className="mb-4 p-2 bg-yellow-500/10 border border-yellow-500/20 rounded-xl">
+                  <p className="text-[8px] uppercase tracking-tighter text-yellow-500 font-black mb-1">{t.pending}</p>
+                  <p className="text-[10px] font-bold text-white">${user?.pending_amount?.toFixed(2)}</p>
+                </div>
+              )}
               <p className="text-[10px] uppercase tracking-widest text-white/50 font-bold mb-2">{t.status_title}</p>
               {user?.has_paid ? (
                 <div className="space-y-1">
@@ -577,7 +583,7 @@ export default function Dashboard() {
                       whileHover={{ scale: 1.01 }}
                       whileTap={{ scale: 0.99 }}
                       onClick={() => !isLocked && setExpandedMatch(isExpanded ? null : idx)}
-                      className={`bg-black/95 backdrop-blur-2xl rounded-[2.5rem] border border-white/10 transition-all group overflow-hidden flex flex-col relative cursor-pointer ${isLocked ? 'grayscale-[0.5] opacity-80' : 'hover:border-green-400 hover:shadow-[0_0_30px_rgba(34,197,94,0.15)] shadow-2xl'}`}
+                      className={`bg-black/95 backdrop-blur-2xl rounded-[2.5rem] border border-white/10 transition-all group overflow-hidden flex flex-col relative cursor-pointer ${isLocked ? 'grayscale-[0.5] opacity-80' : 'hover:border-green-400 hover:shadow-[0_0_60px_rgba(34,197,94,0.5)] shadow-2xl active:shadow-green-400/80 active:scale-[0.98]'}`}
                     >
                       {isLocked && (
                         <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] z-10 flex flex-col items-center justify-center p-6 text-center">

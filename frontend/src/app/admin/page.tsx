@@ -46,7 +46,7 @@ export default function AdminDashboard() {
   const [selectedReceipt, setSelectedReceipt] = useState<{path: string, email: string, amount: number} | null>(null);
 
   const checkAdmin = async () => {
-    const token = localStorage.getItem("token");
+    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
     if (!token) {
       router.push("/login");
       return;
@@ -70,7 +70,7 @@ export default function AdminDashboard() {
   };
 
   const fetchUsers = async () => {
-    const token = localStorage.getItem("token");
+    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
     try {
       const res = await fetch(`${API_BASE}/admin/users`, {
         headers: { "Authorization": `Bearer ${token}` }
@@ -84,7 +84,7 @@ export default function AdminDashboard() {
   };
 
   const fetchTransactions = async () => {
-    const token = localStorage.getItem("token");
+    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
     try {
       const res = await fetch(`${API_BASE}/admin/transactions`, {
         headers: { "Authorization": `Bearer ${token}` }
@@ -97,7 +97,7 @@ export default function AdminDashboard() {
   };
 
   const fetchSettings = async () => {
-    const token = localStorage.getItem("token");
+    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
     try {
       const res = await fetch(`${API_BASE}/admin/settings`, {
         headers: { "Authorization": `Bearer ${token}` }
@@ -114,7 +114,7 @@ export default function AdminDashboard() {
   }, []);
 
   const handleApprove = async (email: string, plan: string) => {
-    const token = localStorage.getItem("token");
+    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
     let days = 1;
     if (plan === "5-day") days = 5;
     else if (plan === "10-day") days = 10;
@@ -137,7 +137,7 @@ export default function AdminDashboard() {
     const days = prompt("Enter number of days for this plan:", "30");
     if (!days) return;
 
-    const token = localStorage.getItem("token");
+    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
     const formData = new FormData();
     formData.append("tx_id", txId.toString());
     formData.append("days", days);
@@ -153,7 +153,7 @@ export default function AdminDashboard() {
 
   const handleRejectTx = async (txId: number) => {
     if (!confirm("Reject this transaction?")) return;
-    const token = localStorage.getItem("token");
+    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
     const formData = new FormData();
     formData.append("tx_id", txId.toString());
 
@@ -167,7 +167,7 @@ export default function AdminDashboard() {
   };
 
   const handleReject = async (email: string) => {
-    const token = localStorage.getItem("token");
+    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
     const formData = new FormData();
     formData.append("email", email);
 
@@ -181,7 +181,7 @@ export default function AdminDashboard() {
 
   const handleCancelSubscription = async (email: string) => {
     if (!confirm("Are you sure you want to cancel this subscription?")) return;
-    const token = localStorage.getItem("token");
+    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
     const formData = new FormData();
     formData.append("email", email);
 
@@ -195,7 +195,7 @@ export default function AdminDashboard() {
 
   const handleDeleteUser = async (email: string) => {
     if (!confirm(`Are you sure you want to PERMANENTLY delete user ${email}?`)) return;
-    const token = localStorage.getItem("token");
+    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
     const formData = new FormData();
     formData.append("email", email);
 
@@ -211,7 +211,7 @@ export default function AdminDashboard() {
     const days = prompt("Enter number of days to add:", "30");
     if (!days) return;
     
-    const token = localStorage.getItem("token");
+    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
     const formData = new FormData();
     formData.append("email", email);
     formData.append("days", days);
@@ -228,7 +228,7 @@ export default function AdminDashboard() {
     const newBalance = prompt("Enter new balance:", currentBalance.toString());
     if (newBalance === null) return;
     
-    const token = localStorage.getItem("token");
+    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
     const formData = new FormData();
     formData.append("email", email);
     formData.append("balance", newBalance);
@@ -245,7 +245,7 @@ export default function AdminDashboard() {
     const newExpiry = prompt("Enter new expiry date (YYYY-MM-DDTHH:MM:SS):", currentExpiry || new Date().toISOString());
     if (newExpiry === null) return;
     
-    const token = localStorage.getItem("token");
+    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
     const formData = new FormData();
     formData.append("email", email);
     formData.append("expiry_date", newExpiry);
@@ -260,7 +260,7 @@ export default function AdminDashboard() {
 
   const updateSettings = async (e: React.FormEvent) => {
     e.preventDefault();
-    const token = localStorage.getItem("token");
+    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
     const formData = new FormData();
     formData.append("binance_id", settings.binance_id);
     formData.append("baridimob_id", settings.baridimob_id);
