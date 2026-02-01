@@ -1,6 +1,6 @@
 "use client";
 import { motion } from "framer-motion";
-import { LogOut, RefreshCw, User, Flame, TrendingUp, AlertCircle, ChevronDown, ChevronUp, Goal, Shield, Activity, Lock, ShieldAlert } from "lucide-react";
+import { LogOut, RefreshCw, User, Flame, TrendingUp, AlertCircle, ChevronDown, ChevronUp, Goal, Shield, Activity, Lock, ShieldAlert, Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
@@ -230,6 +230,7 @@ export default function Dashboard() {
   const [error, setError] = useState("");
   const [isPaymentError, setIsPaymentError] = useState(false);
   const [expandedMatch, setExpandedMatch] = useState<number | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const t = translations[lang];
 
@@ -330,23 +331,38 @@ export default function Dashboard() {
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/60" />
       </div>
 
+      {/* Mobile Menu Button */}
+      <button 
+        onClick={() => setSidebarOpen(!sidebarOpen)}
+        className="fixed top-6 right-6 z-50 p-3 bg-blue-600 rounded-2xl md:hidden shadow-lg shadow-blue-600/20"
+      >
+        {sidebarOpen ? <X className="text-white" size={24} /> : <Menu className="text-white" size={24} />}
+      </button>
+
+      {/* Sidebar Overlay */}
+      {sidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className={`w-20 md:w-64 bg-black/95 backdrop-blur-2xl border-white/10 p-6 flex flex-col items-center md:items-start relative z-10 ${lang === 'ar' ? 'border-l' : 'border-r'}`}>
-        <div className="text-2xl font-black italic text-blue-500 mb-12 hidden md:block">GOALAI</div>
-        <div className="text-2xl font-black italic text-blue-500 mb-12 md:hidden">G</div>
+      <aside className={`fixed md:relative inset-y-0 ${lang === 'ar' ? 'right-0' : 'left-0'} z-40 w-72 bg-black/95 backdrop-blur-2xl border-white/10 p-6 flex flex-col items-start transform transition-transform duration-300 ease-in-out ${sidebarOpen ? 'translate-x-0' : (lang === 'ar' ? 'translate-x-full' : '-translate-x-full')} md:translate-x-0 md:flex ${lang === 'ar' ? 'border-l' : 'border-r'}`}>
+        <div className="text-2xl font-black italic text-blue-500 mb-12">GOALAI</div>
 
         <nav className="space-y-8 flex-grow w-full">
           <SidebarItem 
             icon={<TrendingUp />} 
             label={t.matches} 
             active={view === "matches"} 
-            onClick={() => setView("matches")} 
+            onClick={() => { setView("matches"); setSidebarOpen(false); }} 
           />
           <SidebarItem 
             icon={<User />} 
             label={t.profile} 
             active={view === "profile"} 
-            onClick={() => setView("profile")} 
+            onClick={() => { setView("profile"); setSidebarOpen(false); }} 
           />
 
           {user?.is_admin && (
@@ -359,14 +375,14 @@ export default function Dashboard() {
           )}
 
           {/* Language Selector */}
-          <div className="pt-8 border-t border-white/5 space-y-4">
-            <p className="text-[10px] uppercase tracking-widest text-white/50 font-bold mb-2 hidden md:block">Language</p>
-            <div className="flex flex-col md:flex-row gap-2">
+          <div className="pt-8 border-t border-white/5 space-y-4 w-full">
+            <p className="text-[10px] uppercase tracking-widest text-white/50 font-bold mb-2">Language</p>
+            <div className="flex gap-2">
               {['en', 'ar', 'fr'].map((l) => (
                 <button
                   key={l}
-                  onClick={() => changeLang(l as any)}
-                  className={`px-2 py-1 rounded text-[10px] font-bold transition-colors ${lang === l ? 'bg-blue-500 text-white' : 'bg-white/5 text-white/40 hover:text-white'}`}
+                  onClick={() => { changeLang(l as any); setSidebarOpen(false); }}
+                  className={`flex-1 py-2 rounded-xl text-[10px] font-bold transition-colors ${lang === l ? 'bg-blue-500 text-white' : 'bg-white/5 text-white/40 hover:text-white'}`}
                 >
                   {l.toUpperCase()}
                 </button>
@@ -374,7 +390,7 @@ export default function Dashboard() {
             </div>
           </div>
           
-          <div className="pt-8 border-t border-white/5 hidden md:block">
+          <div className="pt-8 border-t border-white/5 w-full">
             <div className="bg-white/5 p-4 rounded-2xl border border-white/5">
               <div className="flex justify-between items-center mb-4 pb-2 border-b border-white/5">
                 <p className="text-[10px] uppercase tracking-widest text-white/50 font-bold">{t.balance}</p>
@@ -388,32 +404,19 @@ export default function Dashboard() {
                     {t.premium_active}
                   </div>
                   {user.days_left !== undefined && (
-                    <p className="text-[9px] text-gray-500 font-medium">
+                    <p className="text-[9px] text-gray-400 font-medium">
                       {t.expiry}: <span className="text-white">{user.days_left}</span>
                     </p>
-                  )}
-                  {(user?.pending_amount ?? 0) > 0 && (
-                    <div className="mt-2 p-2 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
-                      <p className="text-[8px] text-yellow-500 font-black uppercase tracking-widest">{t.pending}</p>
-                      <p className="text-[10px] text-white font-bold">${user?.pending_amount?.toFixed(2)}</p>
-                    </div>
                   )}
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {user?.status === "pending" ? (
-                    <div className="flex items-center gap-2 text-yellow-500 text-[10px] font-bold">
-                      <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full animate-pulse" />
-                      {t.pending}
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-2 text-red-500 text-[10px] font-bold">
-                      <div className="w-1.5 h-1.5 bg-red-500 rounded-full" />
-                      {t.free}
-                    </div>
-                  )}
+                  <div className="flex items-center gap-2 text-red-500 text-[10px] font-bold">
+                    <div className="w-1.5 h-1.5 bg-red-500 rounded-full" />
+                    {t.free}
+                  </div>
                   <button 
-                    onClick={() => router.push("/payment")}
+                    onClick={() => { router.push("/payment"); setSidebarOpen(false); }}
                     className="w-full bg-blue-600 hover:bg-blue-700 py-2 rounded-xl text-[10px] font-bold transition-colors shadow-lg shadow-blue-600/10"
                   >
                     {t.upgrade_btn}
@@ -423,11 +426,14 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <button onClick={fetchData} className="flex items-center gap-4 text-white/60 hover:text-white transition-colors w-full px-2">
-            <div className={`p-2 rounded-lg group-hover:bg-white/5 ${loading ? 'animate-spin' : ''}`}>
+          <button 
+            onClick={() => { fetchData(); setSidebarOpen(false); }} 
+            className="flex items-center gap-4 text-white/60 hover:text-white transition-colors w-full px-2 mt-4"
+          >
+            <div className={`p-2 rounded-lg ${loading ? 'animate-spin' : ''}`}>
               <RefreshCw size={20} />
             </div>
-            <span className="hidden md:block font-medium">{t.refresh}</span>
+            <span className="font-medium">{t.refresh}</span>
           </button>
 
           <button 
@@ -437,7 +443,7 @@ export default function Dashboard() {
             <div className="p-2 rounded-lg">
               <LogOut size={20} />
             </div>
-            <span className="hidden md:block font-medium">{t.logout}</span>
+            <span className="font-medium">{t.logout}</span>
           </button>
         </nav>
       </aside>
