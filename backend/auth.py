@@ -1,10 +1,11 @@
+import os
 from datetime import datetime, timedelta
 from typing import Optional
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from fastapi import HTTPException, status
 
-SECRET_KEY = "SUPER_SECRET_KEY_FOR_FOOTBALL_APP"
+SECRET_KEY = os.getenv("SECRET_KEY", "SUPER_SECRET_KEY_FOR_FOOTBALL_APP")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24  # 1 day
 
