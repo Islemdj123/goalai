@@ -219,6 +219,8 @@ export default function Payment() {
   const [receipt, setReceipt] = useState<File | null>(null);
   const [settings, setSettings] = useState({ binance_id: "Loading...", baridimob_id: "Loading..." });
   const [submitting, setSubmitting] = useState(false);
+  const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
+  const [errorMsg, setErrorMsg] = useState("");
 
   useEffect(() => {
     const savedLang = localStorage.getItem("lang") as any;
@@ -235,13 +237,21 @@ export default function Payment() {
   const handleSubmit = async () => {
     const token = localStorage.getItem("token");
     if (!token) {
-      alert(t.alert_login);
+      setErrorMsg(t.alert_login);
+      setStatus("error");
       router.push("/login");
       return;
     }
     
-    if (!txId || !receipt || !amount) return alert(t.alert_missing);
+    if (!txId || !receipt || !amount) {
+      setErrorMsg(t.alert_missing);
+      setStatus("error");
+      return;
+    }
+
     setSubmitting(true);
+    setStatus("idle");
+    setErrorMsg("");
     
     const formData = new FormData();
     formData.append("plan_id", selectedPlan.id);
@@ -252,21 +262,21 @@ export default function Payment() {
     try {
       const res = await fetch(`${API_BASE}/submit-payment`, {
         method: "POST",
-        headers: {
-          "Authorization": `Bearer ${token}`
-        },
+        headers: { "Authorization": `Bearer ${token}` },
         body: formData
       });
       
       if (res.ok) {
-        alert(t.alert_success);
-        router.push("/dashboard");
+        setStatus("success");
+        setTimeout(() => router.push("/dashboard"), 3000);
       } else {
         const errorData = await res.json();
-        alert(`${t.alert_fail}: ${errorData.detail || "Unknown error"}`);
+        setErrorMsg(errorData.detail || t.alert_fail);
+        setStatus("error");
       }
     } catch (err) {
-      alert(`Error: ${err}`);
+      setErrorMsg("Connection Error");
+      setStatus("error");
     } finally {
       setSubmitting(false);
     }
@@ -289,6 +299,20 @@ export default function Payment() {
           </button>
           
           <h2 className="text-2xl font-black mb-2">{t.payment_for} <span className="text-blue-500">{selectedPlan.name}</span></h2>
+          
+          {status === "success" && (
+            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-green-500/10 border border-green-500/20 p-4 rounded-2xl mb-6 text-center">
+              <ShieldCheck className="text-green-500 mx-auto mb-2" size={32} />
+              <p className="text-green-500 font-bold text-sm">{t.alert_success}</p>
+            </motion.div>
+          )}
+
+          {status === "error" && (
+            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-red-500/10 border border-red-500/20 p-4 rounded-2xl mb-6 text-center">
+              <AlertCircle className="text-red-500 mx-auto mb-2" size={32} />
+              <p className="text-red-500 font-bold text-sm">{errorMsg}</p>
+            </motion.div>
+          )}
           <div className="flex items-center gap-3 mb-8">
             <p className="text-white font-black text-2xl tabular-nums">{selectedPlan.price_usdt}</p>
             <span className="text-gray-600 font-bold">{t.or}</span>

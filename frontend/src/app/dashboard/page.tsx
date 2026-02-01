@@ -68,8 +68,8 @@ const translations: any = {
     upgrade_btn: "UPGRADE / RENEW",
     logout: "Logout",
     topup: "Top Up Balance",
-    matches: "Matches",
-    profile: "Profile & Subscription",
+    matches: "Predictions Center",
+    profile: "Account & Subscription",
     refresh: "Refresh",
     reasoning: "AI Reasoning",
     analyzing: "Analyzing upcoming matches...",
@@ -104,8 +104,8 @@ const translations: any = {
     upgrade_btn: "ترقية / تجديد",
     logout: "خروج",
     topup: "شحن الرصيد",
-    matches: "المباريات",
-    profile: "الملف والاشتراك",
+    matches: "مركز التوقعات والمباريات",
+    profile: "بيانات الحساب والاشتراك",
     refresh: "تحديث",
     reasoning: "تحليل الذكاء الاصطناعي",
     analyzing: "جاري تحليل المباريات القادمة...",
@@ -774,10 +774,10 @@ function SidebarItem({ icon, label, active = false, onClick }: { icon: any, labe
   return (
     <div 
       onClick={onClick}
-      className={`flex items-center gap-4 cursor-pointer group transition-colors ${active ? 'text-blue-500' : 'text-white/60 hover:text-white'}`}
+      className={`flex items-center gap-4 cursor-pointer group transition-colors p-2 rounded-2xl w-full ${active ? 'bg-blue-500/10 text-blue-500 border border-blue-500/10' : 'text-white/60 hover:text-white hover:bg-white/5'}`}
     >
-      <div className={`p-2 rounded-lg ${active ? 'bg-blue-500/10' : 'group-hover:bg-white/5'}`}>{icon}</div>
-      <span className="hidden md:block font-medium">{label}</span>
+      <div className={`p-1 rounded-lg`}>{icon}</div>
+      <span className="font-bold text-sm tracking-tight">{label}</span>
     </div>
   );
 }
