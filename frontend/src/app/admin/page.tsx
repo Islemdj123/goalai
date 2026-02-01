@@ -34,6 +34,8 @@ interface Transaction {
 
 export default function AdminDashboard() {
   const router = useRouter();
+  const API_BASE = typeof window !== "undefined" && window.location.hostname === "localhost" ? "http://localhost:8000" : "/api";
+  
   const [activeTab, setActiveTab] = useState<"users" | "transactions" | "settings">("users");
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -42,8 +44,6 @@ export default function AdminDashboard() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedReceipt, setSelectedReceipt] = useState<{path: string, email: string, amount: number} | null>(null);
-
-  const API_BASE = window.location.hostname === "localhost" ? "http://localhost:8000" : "/api";
 
   const checkAdmin = async () => {
     const token = localStorage.getItem("token");

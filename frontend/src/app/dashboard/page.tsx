@@ -219,6 +219,8 @@ const LiveMinute = ({ status, initialMinute }: { status: string, initialMinute: 
 
 export default function Dashboard() {
   const router = useRouter();
+  const API_BASE = typeof window !== "undefined" && window.location.hostname === "localhost" ? "http://localhost:8000" : "/api";
+
   const [view, setView] = useState<"matches" | "profile">("matches");
   const [lang, setLang] = useState<"en" | "ar" | "fr">("en");
   const [user, setUser] = useState<{email: string, username: string, has_paid: boolean, status: string, days_left?: number, expiry_date?: string, balance?: number, is_admin?: boolean, pending_amount?: number} | null>(null);
@@ -255,9 +257,6 @@ export default function Dashboard() {
       router.push("/login");
       return;
     }
-
-    // تحديد عنوان الـ API ديناميكياً
-    const API_BASE = window.location.hostname === "localhost" ? "http://localhost:8000" : "/api";
 
     try {
       // 1. Fetch User Info

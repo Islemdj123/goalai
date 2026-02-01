@@ -7,10 +7,10 @@ import { useRouter } from "next/navigation";
 export default function Register() {
   const [formData, setFormData] = useState({ username: "", email: "", password: "", confirm: "" });
   const router = useRouter();
+  const API_BASE = typeof window !== "undefined" && window.location.hostname === "localhost" ? "http://localhost:8000" : "/api";
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    const API_BASE = window.location.hostname === "localhost" ? "http://localhost:8000" : "/api";
     if (formData.password !== formData.confirm) {
       alert("Passwords do not match");
       return;

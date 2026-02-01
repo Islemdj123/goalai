@@ -8,10 +8,10 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
+  const API_BASE = typeof window !== "undefined" && window.location.hostname === "localhost" ? "http://localhost:8000" : "/api";
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    const API_BASE = window.location.hostname === "localhost" ? "http://localhost:8000" : "/api";
     try {
       const res = await fetch(`${API_BASE}/login`, {
         method: "POST",

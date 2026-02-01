@@ -210,6 +210,8 @@ const translations: any = {
 
 export default function Payment() {
   const router = useRouter();
+  const API_BASE = typeof window !== "undefined" && window.location.hostname === "localhost" ? "http://localhost:8000" : "/api";
+
   const [lang, setLang] = useState<"en" | "ar" | "fr">("en");
   const [selectedPlan, setSelectedPlan] = useState<any>(null);
   const [txId, setTxId] = useState("");
@@ -221,8 +223,6 @@ export default function Payment() {
   useEffect(() => {
     const savedLang = localStorage.getItem("lang") as any;
     if (savedLang) setLang(savedLang);
-
-    const API_BASE = window.location.hostname === "localhost" ? "http://localhost:8000" : "/api";
 
     fetch(`${API_BASE}/payment-settings`)
       .then(res => res.json())
@@ -243,8 +243,6 @@ export default function Payment() {
     if (!txId || !receipt || !amount) return alert(t.alert_missing);
     setSubmitting(true);
     
-    const API_BASE = window.location.hostname === "localhost" ? "http://localhost:8000" : "/api";
-
     const formData = new FormData();
     formData.append("plan_id", selectedPlan.id);
     formData.append("tx_id", txId);
