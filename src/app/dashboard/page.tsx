@@ -604,8 +604,8 @@ export default function Dashboard() {
                     ))}
                   </div>
                 ) : (
-                  <div className="bg-white/5 border border-white/5 rounded-3xl p-8 text-center">
-                    <p className="text-gray-500 font-bold">{t.no_live}</p>
+                  <div className="bg-black/40 backdrop-blur-md border border-white/5 rounded-3xl p-10 text-center shadow-inner">
+                    <p className="text-gray-600 font-bold italic">{t.no_live}</p>
                   </div>
                 )}
               </section>

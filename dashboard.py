@@ -400,7 +400,11 @@ def main():
         if nav_view == "Home Center":
             st.markdown("### 🏟️ Live Now")
             if not live_matches:
-                st.info("No live matches currently in progress.")
+                st.markdown("""
+                    <div style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.05); padding: 30px; border-radius: 20px; text-align: center; margin-bottom: 20px;">
+                        <span style="color: #666; font-weight: bold; font-style: italic;">No live matches currently in progress.</span>
+                    </div>
+                """, unsafe_allow_html=True)
             else:
                 for m in live_matches:
                     h_logo = m.get('home_logo', '')
