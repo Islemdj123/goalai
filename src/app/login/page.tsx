@@ -29,7 +29,7 @@ export default function Login() {
       }
     } catch (err) {
       console.error("Login connection error:", err);
-      alert("تعذر الاتصال بالسيرفر. تأكد من أن الـ Backend في Render يعمل بشكل صحيح.");
+      alert(`تعذر الاتصال بالسيرفر. الرابط المستخدم: ${API_BASE}`);
     }
   };
 
