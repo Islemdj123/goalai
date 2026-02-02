@@ -68,7 +68,8 @@ const translations: any = {
     upgrade_btn: "UPGRADE / RENEW",
     logout: "Logout",
     topup: "Top Up Balance",
-    matches: "Predictions Center",
+    matches: "Home Center",
+    predictions: "Predictions Only",
     profile: "Account & Subscription",
     refresh: "Refresh",
     reasoning: "AI Reasoning",
@@ -104,7 +105,8 @@ const translations: any = {
     upgrade_btn: "ترقية / تجديد",
     logout: "خروج",
     topup: "شحن الرصيد",
-    matches: "التنبؤات",
+    matches: "الرئيسية",
+    predictions: "التنبؤات فقط",
     profile: "معلومات الحساب",
     refresh: "تحديث",
     reasoning: "تحليل الذكاء الاصطناعي",
@@ -140,7 +142,8 @@ const translations: any = {
     upgrade_btn: "UPGRADER / RENOUVELER",
     logout: "Déconnexion",
     topup: "Recharger Solde",
-    matches: "Matchs",
+    matches: "Accueil",
+    predictions: "Prédictions Seules",
     profile: "Profil & Abonnement",
     refresh: "Actualiser",
     reasoning: "Analyse IA",
@@ -221,7 +224,7 @@ export default function Dashboard() {
   const router = useRouter();
   const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
-  const [view, setView] = useState<"matches" | "profile">("matches");
+  const [view, setView] = useState<"matches" | "profile" | "predictions">("matches");
   const [lang, setLang] = useState<"en" | "ar" | "fr">("en");
   const [user, setUser] = useState<{email: string, username: string, has_paid: boolean, status: string, days_left?: number, expiry_date?: string, balance?: number, is_admin?: boolean, pending_amount?: number} | null>(null);
   const [matches, setMatches] = useState<Match[]>([]);
@@ -339,8 +342,15 @@ export default function Dashboard() {
             onClick={() => { setView("matches"); setSidebarOpen(false); }}
             className={`flex items-center gap-2 px-3 py-2 rounded-xl text-[10px] font-black uppercase transition-all ${view === "matches" ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20" : "bg-white/5 text-white/50"}`}
           >
-            <TrendingUp size={14} />
+            <Activity size={14} />
             <span>{t.matches}</span>
+          </button>
+          <button 
+            onClick={() => { setView("predictions"); setSidebarOpen(false); }}
+            className={`flex items-center gap-2 px-3 py-2 rounded-xl text-[10px] font-black uppercase transition-all ${view === "predictions" ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20" : "bg-white/5 text-white/50"}`}
+          >
+            <TrendingUp size={14} />
+            <span>{t.predictions}</span>
           </button>
           <button 
             onClick={() => { setView("profile"); setSidebarOpen(false); }}
@@ -370,12 +380,18 @@ export default function Dashboard() {
       <aside className={`fixed md:relative inset-y-0 ${lang === 'ar' ? 'right-0' : 'left-0'} z-40 w-72 bg-black/95 backdrop-blur-2xl border-white/10 p-6 flex flex-col items-start transform transition-transform duration-300 ease-in-out ${sidebarOpen ? 'translate-x-0' : (lang === 'ar' ? 'translate-x-full' : '-translate-x-full')} md:translate-x-0 md:flex ${lang === 'ar' ? 'border-l' : 'border-r'}`}>
         <div className="text-2xl font-black italic text-blue-500 mb-12">GOALAI</div>
 
-        <nav className="space-y-8 flex-grow w-full">
+        <nav className="space-y-6 flex-grow w-full">
           <SidebarItem 
-            icon={<TrendingUp />} 
+            icon={<Activity />} 
             label={t.matches} 
             active={view === "matches"} 
             onClick={() => { setView("matches"); setSidebarOpen(false); }} 
+          />
+          <SidebarItem 
+            icon={<TrendingUp />} 
+            label={t.predictions} 
+            active={view === "predictions"} 
+            onClick={() => { setView("predictions"); setSidebarOpen(false); }} 
           />
           <SidebarItem 
             icon={<User />} 
@@ -475,13 +491,31 @@ export default function Dashboard() {
 
       {/* Main Content */}
       <main className="flex-grow p-6 md:p-10 overflow-y-auto relative z-10 pt-24 md:pt-10">
-        {view === "matches" ? (
+        {view === "matches" || view === "predictions" ? (
           <>
             <header className="flex justify-between items-center mb-10">
               <div>
-                <h1 className="text-3xl font-bold">{t.title}</h1>
-                <p className="text-white/50">{t.subtitle}</p>
+                <h1 className="text-3xl font-bold">{view === "predictions" ? t.predictions : t.title}</h1>
+                <p className="text-white/50">{view === "predictions" ? t.subtitle : t.subtitle}</p>
               </div>
+              {view === "matches" && (
+                <button 
+                  onClick={() => setView("predictions")}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-xl font-bold text-xs transition-all flex items-center gap-2"
+                >
+                  <TrendingUp size={16} />
+                  {t.predictions}
+                </button>
+              )}
+              {view === "predictions" && (
+                <button 
+                  onClick={() => setView("matches")}
+                  className="bg-white/10 hover:bg-white/20 text-white px-6 py-2 rounded-xl font-bold text-xs transition-all flex items-center gap-2"
+                >
+                  <Activity size={16} />
+                  {t.matches}
+                </button>
+              )}
             </header>
 
             {user?.status === "expired" && (
@@ -507,7 +541,8 @@ export default function Dashboard() {
                 </button>
               </motion.div>
             )}
-            {liveMatches.length > 0 && (
+
+            {view === "matches" && liveMatches.length > 0 && (
               <section className="mb-12">
                 <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
                   <div className="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_15px_rgba(34,197,94,0.8)]" />

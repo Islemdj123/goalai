@@ -165,26 +165,20 @@ def main():
                 user = db.query(models.User).filter(models.User.email == e_login).first()
                 if user:
                     stored_pass = user.password or ""
-                    # Check if hashed or plain
                     is_valid = False
                     if stored_pass.startswith('$pbkdf2-sha256$') or stored_pass.startswith('$2b$'):
-                        try:
-                            is_valid = verify_password(p_login, stored_pass)
-                        except:
-                            is_valid = (p_login == stored_pass)
-                    else:
-                        is_valid = (p_login == stored_pass)
+                        try: is_valid = verify_password(p_login, stored_pass)
+                        except: is_valid = (p_login == stored_pass)
+                    else: is_valid = (p_login == stored_pass)
                     
                     if is_valid:
                         st.session_state.authenticated = True
                         st.session_state.username = e_login
-                        if e_login == "islemdjeridi" or e_login == "admin@match.ai" or e_login == "admin":
+                        if e_login in ["islemdjeridi", "admin@match.ai", "admin"]:
                             st.session_state.admin_access = True
                         st.rerun()
-                    else:
-                        st.error("Invalid credentials")
-                else:
-                    st.error("User not found")
+                    else: st.error("Invalid credentials")
+                else: st.error("User not found")
         
         with tab_reg:
             u_reg = st.text_input("Username", key="r_user")
@@ -192,16 +186,9 @@ def main():
             p_reg = st.text_input("Password", type="password", key="r_pass")
             if st.button("Create Account"):
                 existing = db.query(models.User).filter(models.User.email == e_reg).first()
-                if existing:
-                    st.error("Email already exists")
+                if existing: st.error("Email already exists")
                 elif e_reg and p_reg:
-                    new_user = models.User(
-                        username=u_reg,
-                        email=e_reg,
-                        password=get_password_hash(p_reg),
-                        status="unpaid",
-                        has_paid=False
-                    )
+                    new_user = models.User(username=u_reg, email=e_reg, password=get_password_hash(p_reg), status="unpaid", has_paid=False)
                     db.add(new_user)
                     db.commit()
                     st.success("Account created! Please login.")
@@ -209,7 +196,7 @@ def main():
         st.info("Please login to access the dashboard.")
         return
 
-    # جلب بيانات المستخدم الحالي
+    # User data
     current_user_email = st.session_state.username
     db_user = db.query(models.User).filter(models.User.email == current_user_email).first()
     if not db_user:
@@ -217,63 +204,22 @@ def main():
         st.rerun()
 
     st.session_state.payment_status = db_user.status or "unpaid"
+    
+    nav_view = st.sidebar.radio("View", ["Home Center", "Predictions Only", "Profile"])
+
+    if nav_view == "Profile":
+        st.markdown(f"### 👤 Profile: {db_user.username}")
+        if st.sidebar.button("Logout"):
+            st.session_state.authenticated = False
+            st.rerun()
+        return
 
     # --- ميزة اختيار الخطة والدفع ---
-    if st.session_state.payment_status == "unpaid":
-        if not st.session_state.get('show_payment_ui'):
-            st.markdown("### 💎 Step 1: Choose Your Premium Plan")
-            st.info("Select a plan to continue to payment details.")
-            
-            col_p1, col_p2, col_p3 = st.columns(3)
-            
-            with col_p1:
-                st.markdown("""
-                <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px; border: 1px solid #00d4ff; text-align: center;">
-                    <h4>Daily</h4>
-                    <h2 style="color: #00d4ff;">5 USDT</h2>
-                    <p>1,250 DZD</p>
-                    <p style="font-size: 0.8em; color: #888;">24 Hours Access</p>
-                </div>
-                """, unsafe_allow_html=True)
-                if st.button("Select Daily", key="btn_daily", use_container_width=True):
-                    st.session_state.selected_plan = "daily"
-                    st.session_state.show_payment_ui = True
-                    st.rerun()
-
-            with col_p2:
-                st.markdown("""
-                <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px; border: 1px solid #ff4b2b; text-align: center;">
-                    <h4>Monthly Elite</h4>
-                    <h2 style="color: #ff4b2b;">120 USDT</h2>
-                    <p>30,000 DZD</p>
-                    <p style="font-size: 0.8em; color: #888;">30 Days Access</p>
-                </div>
-                """, unsafe_allow_html=True)
-                if st.button("Select Monthly", key="btn_monthly", use_container_width=True):
-                    st.session_state.selected_plan = "monthly"
-                    st.session_state.show_payment_ui = True
-                    st.rerun()
-
-            with col_p3:
-                st.markdown("""
-                <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px; border: 1px solid #ffbc00; text-align: center;">
-                    <h4>Yearly Pro</h4>
-                    <h2 style="color: #ffbc00;">900 USDT</h2>
-                    <p>225,000 DZD</p>
-                    <p style="font-size: 0.8em; color: #888;">365 Days Access</p>
-                </div>
-                """, unsafe_allow_html=True)
-                if st.button("Select Yearly", key="btn_yearly", use_container_width=True):
-                    st.session_state.selected_plan = "yearly"
-                    st.session_state.show_payment_ui = True
-                    st.rerun()
-        
-        else:
-            # واجهة الدفع تظهر فقط بعد اختيار الخطة
-            st.markdown(f"### 💳 Step 2: Complete Payment for `{st.session_state.selected_plan}`")
-            if st.button("⬅️ Change Plan / Back"):
-                st.session_state.show_payment_ui = False
-                st.rerun()
+    if st.session_state.payment_status == "unpaid" and st.session_state.get('show_payment_ui'):
+        st.markdown(f"### 💳 Complete Payment for `{st.session_state.get('selected_plan', 'Premium')}`")
+        if st.button("⬅️ Change Plan / Back"):
+            st.session_state.show_payment_ui = False
+            st.rerun()
                 
             st.markdown("---")
             pay_col1, pay_col2 = st.columns(2)
@@ -325,7 +271,6 @@ def main():
                         st.error("Please upload receipt and enter ID.")
         
         st.markdown("---")
-        st.stop()
 
     # قسم حالة الدفع في القائمة الجانبية (للمتابعة فقط)
     with st.sidebar.expander("💳 Subscription Status"):
@@ -450,7 +395,7 @@ def main():
 
     with col_main:
         # LIVE SECTION
-        if live_matches:
+        if nav_view == "Home Center" and live_matches:
             st.markdown("### 🏟️ Live Now")
             for m in live_matches:
                 h_logo = m.get('home_logo', '')

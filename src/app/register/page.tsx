@@ -31,7 +31,7 @@ export default function Register() {
         const data = await res.json();
         localStorage.setItem("token", data.access_token);
         alert("Account created successfully!");
-        router.push("/payment");
+        router.push("/dashboard");
       } else {
         const err = await res.json();
         alert(err.detail || "Registration failed");
