@@ -24,11 +24,12 @@ export default function Login() {
         localStorage.setItem("token", data.access_token);
         router.push("/dashboard");
       } else {
-        const err = await res.json();
+        const err = await res.json().catch(() => ({ detail: "Login failed (Server Error)" }));
         alert(err.detail || "Login failed");
       }
     } catch (err) {
-      alert("Could not connect to server");
+      console.error("Login connection error:", err);
+      alert("Could not connect to server. Please ensure the backend is running at http://localhost:8000");
     }
   };
 
