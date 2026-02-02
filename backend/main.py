@@ -27,12 +27,13 @@ os.makedirs("data/receipts", exist_ok=True)
 os.makedirs("backend/uploads/landing", exist_ok=True)
 app.mount("/data", StaticFiles(directory="data"), name="data")
 app.mount("/uploads", StaticFiles(directory="backend/uploads"), name="uploads")
+app.mount("/public", StaticFiles(directory="public"), name="public") # Also mount public for background images
 
-# Enable CORS for Next.js
+# Enable CORS for production
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
+    allow_credentials=False, # Set to False for allow_origins=["*"]
     allow_methods=["*"],
     allow_headers=["*"],
     expose_headers=["*"]
@@ -181,7 +182,7 @@ async def submit_payment(
     plan_id: str = Form(...),
     tx_id: str = Form(...),
     amount: float = Form(...),
-    payment_account: str = Form(None),
+    payment_account: str = Form(...), # Made mandatory
     receipt: UploadFile = File(...),
     token: str = Depends(oauth2_scheme),
     db: Session = Depends(get_db)
@@ -193,17 +194,21 @@ async def submit_payment(
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
             
-        receipt_dir = os.path.join(os.path.dirname(__file__), "..", "data", "receipts")
-        os.makedirs(receipt_dir, exist_ok=True)
+        # Ensure data directory exists in root
+        data_dir = os.path.join(os.getcwd(), "data", "receipts")
+        os.makedirs(data_dir, exist_ok=True)
         
         file_ext = receipt.filename.split('.')[-1]
         file_name = f"{email.replace('@', '_')}_{int(time.time())}.{file_ext}"
-        file_path = os.path.join(receipt_dir, file_name)
+        file_path = os.path.join(data_dir, file_name)
         
         with open(file_path, "wb") as buffer:
             content = await receipt.read()
             buffer.write(content)
             
+        # Save path with leading slash for consistent serving
+        receipt_url_path = f"data/receipts/{file_name}"
+        
         user.status = "pending"
         user.payment_status = "pending"
         user.has_paid = False
@@ -211,7 +216,7 @@ async def submit_payment(
         user.pending_amount = amount
         user.txid = f"{plan_id} | {tx_id}"
         user.payment_account = payment_account
-        user.receipt_path = f"data/receipts/{file_name}"
+        user.receipt_path = receipt_url_path
         
         # Log transaction history
         new_transaction = models.Transaction(
@@ -219,15 +224,15 @@ async def submit_payment(
             amount=amount,
             txid=f"{plan_id} | {tx_id}",
             payment_account=payment_account,
-            receipt_path=f"data/receipts/{file_name}",
+            receipt_path=receipt_url_path,
             status="pending"
         )
         db.add(new_transaction)
-        
         db.commit()
         
         return {"status": "success", "message": "Payment submitted for verification"}
     except Exception as e:
+        print(f"Payment Error: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/payment-status")

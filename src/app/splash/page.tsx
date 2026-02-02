@@ -15,8 +15,7 @@ export default function Splash() {
       } else {
         router.push("/login");
       }
-    }, 15000); 
-    return () => clearTimeout(timer);
+    }, 12000); // Set to 12 seconds as requested    return () => clearTimeout(timer);
   }, [router]);
 
   return (

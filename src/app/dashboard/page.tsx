@@ -604,12 +604,13 @@ export default function Dashboard() {
                     ))}
                   </div>
                 ) : (
-                  <div className="bg-black/60 backdrop-blur-md border border-white/5 rounded-[2.5rem] p-12 text-center shadow-2xl">
+                  <div className="bg-black/90 backdrop-blur-3xl border border-white/5 rounded-[2.5rem] p-12 text-center shadow-2xl relative overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-b from-transparent to-blue-500/5 opacity-10" />
                     <div className="w-16 h-16 bg-white/5 rounded-3xl flex items-center justify-center mx-auto mb-4 text-gray-700 border border-white/5">
                       <Activity size={32} />
                     </div>
-                    <p className="text-gray-400 font-black text-lg uppercase tracking-wider">{t.no_live || "لا توجد مباريات مباشرة الان"}</p>
-                    <p className="text-gray-600 text-[10px] mt-2 font-bold uppercase tracking-widest">System scanning for live matches...</p>
+                    <p className="text-gray-400 font-black text-lg uppercase tracking-wider">{t.no_live}</p>
+                    <p className="text-gray-600 text-[10px] mt-2 font-bold uppercase tracking-widest">Scanning live servers for ongoing matches...</p>
                   </div>
                 )}
               </section>
@@ -634,13 +635,14 @@ export default function Dashboard() {
                   <RefreshCw size={18} /> {t.retry}
                 </button>
               </div>
-            ) : (matches.length === 0 && liveMatches.length === 0) ? (
-              <div className="bg-black/60 backdrop-blur-md border border-white/5 rounded-[2.5rem] p-16 text-center shadow-2xl">
+            ) : (matches.length === 0) ? (
+              <div className="bg-black/90 backdrop-blur-3xl border border-white/5 rounded-[2.5rem] p-16 text-center shadow-2xl relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent to-blue-500/5 opacity-10" />
                 <div className="w-16 h-16 bg-white/5 rounded-3xl flex items-center justify-center mx-auto mb-4 text-gray-700 border border-white/5">
                   <TrendingUp size={32} />
                 </div>
-                <p className="text-gray-400 font-black text-lg uppercase tracking-wider">{t.no_predictions || "لا توجد تنبؤات الان"}</p>
-                <p className="text-gray-600 text-[10px] mt-2 font-bold uppercase tracking-widest">All games for today have concluded</p>
+                <p className="text-gray-400 font-black text-lg uppercase tracking-wider">{t.no_predictions}</p>
+                <p className="text-gray-600 text-[10px] mt-2 font-bold uppercase tracking-widest">All predictions for today have been settled</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
