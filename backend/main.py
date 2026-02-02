@@ -10,9 +10,19 @@ import json
 import time
 from datetime import datetime
 from typing import List
+import logging
+
+# Setup logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+logger.info("Starting GoalAI Backend Server...")
 
 # Create tables
-models.Base.metadata.create_all(bind=engine)
+try:
+    models.Base.metadata.create_all(bind=engine)
+    logger.info("Database tables created/verified successfully.")
+except Exception as e:
+    logger.error(f"Database connection/creation failed: {e}")
 
 app = FastAPI(title="AI Football Predictor API")
 
