@@ -16,6 +16,12 @@ models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="AI Football Predictor API")
 
+@app.middleware("http")
+async def remove_api_prefix(request, call_next):
+    if request.url.path.startswith("/api"):
+        request.scope["path"] = request.url.path.replace("/api", "", 1)
+    return await call_next(request)
+
 # Mount static files for receipts
 os.makedirs("data/receipts", exist_ok=True)
 os.makedirs("backend/uploads/landing", exist_ok=True)

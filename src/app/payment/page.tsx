@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
+import { API_BASE } from "@/lib/api";
 import { Check, ArrowLeft, Upload, Send, ShieldCheck, Globe, RefreshCw, AlertCircle } from "lucide-react";
 
 const translations: any = {
@@ -216,7 +217,6 @@ const translations: any = {
 
 export default function Payment() {
   const router = useRouter();
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
   const [lang, setLang] = useState<"en" | "ar" | "fr">("en");
   const [selectedPlan, setSelectedPlan] = useState<any>(null);

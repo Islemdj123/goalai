@@ -2,12 +2,11 @@
 import { useEffect, useState } from "react";
 import Navbar from "@/components/landing/Navbar";
 import Hero from "@/components/landing/Hero";
+import { API_BASE } from "@/lib/api";
 import Features from "@/components/landing/Features";
 import WhyUs from "@/components/landing/WhyUs";
 import Plans from "@/components/landing/Plans";
 import Footer from "@/components/landing/Footer";
-
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export default function LandingPage() {
   const [settings, setSettings] = useState<any>(null);

@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { API_BASE } from "@/lib/api";
 import { motion } from "framer-motion";
 import { 
   Users, Settings, DollarSign, Check, X, Edit, 
@@ -36,7 +37,6 @@ interface Transaction {
 
 export default function AdminDashboard() {
   const router = useRouter();
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
   
   const [activeTab, setActiveTab] = useState<"users" | "transactions" | "settings" | "landing">("users");
   const [users, setUsers] = useState<AdminUser[]>([]);

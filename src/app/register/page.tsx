@@ -3,11 +3,11 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { API_BASE } from "@/lib/api";
 
 export default function Register() {
   const [formData, setFormData] = useState({ username: "", email: "", password: "", confirm: "" });
   const router = useRouter();
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();

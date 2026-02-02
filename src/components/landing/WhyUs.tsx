@@ -1,10 +1,10 @@
 "use client";
 import { motion } from "framer-motion";
 import { CheckCircle2 } from "lucide-react";
+import { API_BASE } from "@/lib/api";
 
 export default function WhyUs({ settings }: { settings: any }) {
   const why_us = settings?.why_us || {};
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
   const imageUrl = why_us.image_url?.startsWith("/") ? `${API_BASE}${why_us.image_url}` : (why_us.image_url || "/ronaldovsmessi.jpg");
 
   return (

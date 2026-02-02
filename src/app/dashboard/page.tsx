@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { LogOut, RefreshCw, User, Flame, TrendingUp, AlertCircle, ChevronDown, ChevronUp, Goal, Shield, Activity, Lock, ShieldAlert, Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { API_BASE } from "@/lib/api";
 
 interface Match {
   match: string;
@@ -228,7 +229,6 @@ const LiveMinute = ({ status, initialMinute }: { status: string, initialMinute: 
 
 export default function Dashboard() {
   const router = useRouter();
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
   const [view, setView] = useState<"matches" | "profile" | "predictions">("matches");
   const [lang, setLang] = useState<"en" | "ar" | "fr">("en");
