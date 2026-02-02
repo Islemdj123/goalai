@@ -1,63 +1,38 @@
 "use client";
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import Navbar from "@/components/landing/Navbar";
+import Hero from "@/components/landing/Hero";
+import Features from "@/components/landing/Features";
+import WhyUs from "@/components/landing/WhyUs";
+import Plans from "@/components/landing/Plans";
+import Footer from "@/components/landing/Footer";
 
-export default function Splash() {
-  const router = useRouter();
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+export default function LandingPage() {
+  const [settings, setSettings] = useState<any>(null);
 
   useEffect(() => {
-    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-    
-    const timer = setTimeout(() => {
-      if (token) {
-        router.push("/dashboard");
-      } else {
-        router.push("/login");
-      }
-    }, 15000); 
-    return () => clearTimeout(timer);
-  }, [router]);
+    fetch(`${API_BASE}/landing/settings`)
+      .then((res) => res.json())
+      .then((data) => setSettings(data))
+      .catch((err) => console.error("Failed to load landing settings", err));
+  }, []);
+
+  if (!settings) return (
+    <div className="h-screen w-screen bg-black flex items-center justify-center">
+      <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+    </div>
+  );
 
   return (
-    <div className="relative h-screen w-screen flex items-center justify-center overflow-hidden bg-black">
-      {/* Background Splash Wallpaper */}
-      <div className="absolute inset-0 z-0">
-        <img 
-          src="/ronaldovsmessi.jpg" 
-          alt="Messi vs Ronaldo Splash" 
-          className="w-full h-full object-cover object-top opacity-70"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent z-10" />
-      </div>
-
-      <motion.div
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 1.5 }}
-        className="z-20 text-center"
-      >
-        <h1 className="text-6xl md:text-8xl font-black italic tracking-tighter text-white mb-4">
-          GOAL<span className="text-blue-500">AI</span>
-        </h1>
-        <p className="text-white text-sm animate-pulse mb-4">LOADING EXPERIENCE...</p>
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1, duration: 1 }}
-          className="text-xl md:text-2xl font-light text-gray-400"
-        >
-          The Future of Football Predictions
-        </motion.p>
-      </motion.div>
-
-      <div className="absolute bottom-10 z-20">
-        <motion.div
-          animate={{ scale: [1, 1.2, 1] }}
-          transition={{ repeat: Infinity, duration: 2 }}
-          className="w-1 h-12 bg-blue-500 rounded-full mx-auto"
-        />
-      </div>
-    </div>
+    <main className="min-h-screen bg-black text-white selection:bg-blue-500/30">
+      <Navbar />
+      <Hero settings={settings} />
+      <Features settings={settings} />
+      <WhyUs settings={settings} />
+      <Plans settings={settings} />
+      <Footer settings={settings} />
+    </main>
   );
 }

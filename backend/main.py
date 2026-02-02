@@ -392,3 +392,18 @@ def get_payment_settings(db: Session = Depends(get_db)):
         "binance_id": binance.value if binance else "Not Set",
         "baridimob_id": baridimob.value if baridimob else "Not Set"
     }
+
+LANDING_SETTINGS_FILE = "data/landing_settings.json"
+
+@app.get("/landing/settings")
+def get_landing_settings():
+    if os.path.exists(LANDING_SETTINGS_FILE):
+        with open(LANDING_SETTINGS_FILE, "r") as f:
+            return json.load(f)
+    return {}
+
+@app.post("/admin/landing/update")
+def update_landing_settings(settings: dict, admin=Depends(get_admin_user)):
+    with open(LANDING_SETTINGS_FILE, "w") as f:
+        json.dump(settings, f, indent=4)
+    return {"status": "success"}

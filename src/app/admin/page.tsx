@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { 
   Users, Settings, DollarSign, Check, X, Edit, 
   Search, Shield, LogOut, RefreshCw, Eye, Calendar,
-  Trash2, Ban
+  Trash2, Ban, Layout
 } from "lucide-react";
 
 interface AdminUser {
@@ -36,10 +36,11 @@ export default function AdminDashboard() {
   const router = useRouter();
   const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
   
-  const [activeTab, setActiveTab] = useState<"users" | "transactions" | "settings">("users");
+  const [activeTab, setActiveTab] = useState<"users" | "transactions" | "settings" | "landing">("users");
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [settings, setSettings] = useState({ binance_id: "", baridimob_id: "" });
+  const [landingSettings, setLandingSettings] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -109,8 +110,33 @@ export default function AdminDashboard() {
     } catch (err) { console.error(err); }
   };
 
+  const fetchLandingSettings = async () => {
+    const res = await fetch(`${API_BASE}/landing/settings`);
+    if (res.ok) {
+      const data = await res.json();
+      setLandingSettings(data);
+    }
+  };
+
+  const updateLandingSettings = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    const res = await fetch(`${API_BASE}/admin/landing/update`, {
+      method: "POST",
+      headers: { 
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(landingSettings)
+    });
+    if (res.ok) {
+      alert("Landing settings updated!");
+    }
+  };
+
   useEffect(() => {
     checkAdmin();
+    fetchLandingSettings();
   }, []);
 
   const handleApprove = async (email: string, plan: string) => {
@@ -333,6 +359,12 @@ export default function AdminDashboard() {
           >
             <Settings size={16} /> Payment Settings
           </button>
+          <button 
+            onClick={() => setActiveTab("landing")}
+            className={`px-6 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-2 ${activeTab === "landing" ? "bg-blue-500 text-white shadow-lg shadow-blue-500/20" : "text-gray-500 hover:text-white"}`}
+          >
+            <Layout size={16} /> Landing Page
+          </button>
         </div>
 
         {activeTab === "users" ? (
@@ -536,7 +568,7 @@ export default function AdminDashboard() {
               </div>
             </div>
           </div>
-        ) : (
+        ) : activeTab === "settings" ? (
           <div className="max-w-2xl bg-white/5 rounded-3xl border border-white/5 p-8">
             <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
               <DollarSign className="text-blue-500" /> Payment Details
@@ -567,6 +599,142 @@ export default function AdminDashboard() {
                 Save Settings
               </button>
             </form>
+          </div>
+        ) : (
+          <div className="max-w-4xl bg-white/5 rounded-3xl border border-white/5 p-8">
+            <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+              <Layout className="text-blue-500" /> Landing Page Settings
+            </h2>
+            {landingSettings && (
+              <form onSubmit={updateLandingSettings} className="space-y-8">
+                {/* Hero Section */}
+                <div className="p-6 bg-white/5 rounded-2xl border border-white/5 space-y-4">
+                  <h3 className="text-blue-500 font-bold uppercase tracking-widest text-xs">Hero Section</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-[10px] uppercase font-black text-gray-500 mb-2">Hero Title</label>
+                      <input 
+                        type="text" 
+                        value={landingSettings.hero.title}
+                        onChange={(e) => setLandingSettings({...landingSettings, hero: {...landingSettings.hero, title: e.target.value}})}
+                        className="w-full bg-black/50 border border-white/5 rounded-xl py-3 px-4 focus:border-blue-500/50 outline-none transition-all"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] uppercase font-black text-gray-500 mb-2">Hero Video URL</label>
+                      <input 
+                        type="text" 
+                        value={landingSettings.hero.video_url}
+                        onChange={(e) => setLandingSettings({...landingSettings, hero: {...landingSettings.hero, video_url: e.target.value}})}
+                        className="w-full bg-black/50 border border-white/5 rounded-xl py-3 px-4 focus:border-blue-500/50 outline-none transition-all"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-[10px] uppercase font-black text-gray-500 mb-2">Hero Subtitle</label>
+                    <textarea 
+                      value={landingSettings.hero.subtitle}
+                      onChange={(e) => setLandingSettings({...landingSettings, hero: {...landingSettings.hero, subtitle: e.target.value}})}
+                      className="w-full bg-black/50 border border-white/5 rounded-xl py-3 px-4 focus:border-blue-500/50 outline-none transition-all h-20"
+                    />
+                  </div>
+                </div>
+
+                {/* Why Us Section */}
+                <div className="p-6 bg-white/5 rounded-2xl border border-white/5 space-y-4">
+                  <h3 className="text-blue-500 font-bold uppercase tracking-widest text-xs">Why Choose Us</h3>
+                  <div>
+                    <label className="block text-[10px] uppercase font-black text-gray-500 mb-2">Section Title</label>
+                    <input 
+                      type="text" 
+                      value={landingSettings.why_us.title}
+                      onChange={(e) => setLandingSettings({...landingSettings, why_us: {...landingSettings.why_us, title: e.target.value}})}
+                      className="w-full bg-black/50 border border-white/5 rounded-xl py-3 px-4 focus:border-blue-500/50 outline-none transition-all"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-[10px] uppercase font-black text-gray-500 mb-2">Points (one per line)</label>
+                    <textarea 
+                      value={landingSettings.why_us.points.join("\n")}
+                      onChange={(e) => setLandingSettings({...landingSettings, why_us: {...landingSettings.why_us, points: e.target.value.split("\n")}})}
+                      className="w-full bg-black/50 border border-white/5 rounded-xl py-3 px-4 focus:border-blue-500/50 outline-none transition-all h-32"
+                    />
+                  </div>
+                </div>
+
+                {/* Features Section */}
+                <div className="p-6 bg-white/5 rounded-2xl border border-white/5 space-y-4">
+                  <h3 className="text-blue-500 font-bold uppercase tracking-widest text-xs">Features</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {landingSettings.features.map((f: any, i: number) => (
+                      <div key={i} className="space-y-2">
+                        <label className="block text-[10px] uppercase font-black text-gray-500">Feature {i+1}</label>
+                        <input 
+                          type="text" 
+                          value={f.title}
+                          onChange={(e) => {
+                            const newFeatures = [...landingSettings.features];
+                            newFeatures[i].title = e.target.value;
+                            setLandingSettings({...landingSettings, features: newFeatures});
+                          }}
+                          className="w-full bg-black/50 border border-white/5 rounded-xl py-2 px-3 text-sm focus:border-blue-500/50 outline-none transition-all mb-2"
+                        />
+                        <textarea 
+                          value={f.description}
+                          onChange={(e) => {
+                            const newFeatures = [...landingSettings.features];
+                            newFeatures[i].description = e.target.value;
+                            setLandingSettings({...landingSettings, features: newFeatures});
+                          }}
+                          className="w-full bg-black/50 border border-white/5 rounded-xl py-2 px-3 text-xs focus:border-blue-500/50 outline-none transition-all h-20"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Plans Section */}
+                <div className="p-6 bg-white/5 rounded-2xl border border-white/5 space-y-4">
+                  <h3 className="text-blue-500 font-bold uppercase tracking-widest text-xs">Plans & Pricing</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {landingSettings.plans.map((p: any, i: number) => (
+                      <div key={i} className="p-4 bg-black/50 rounded-xl border border-white/5 space-y-2">
+                        <input 
+                          type="text" 
+                          value={p.name}
+                          onChange={(e) => {
+                            const newPlans = [...landingSettings.plans];
+                            newPlans[i].name = e.target.value;
+                            setLandingSettings({...landingSettings, plans: newPlans});
+                          }}
+                          className="w-full bg-transparent border-none font-bold text-blue-500 p-0 outline-none"
+                        />
+                        <div className="flex items-center gap-1">
+                          <span className="text-xs text-gray-500">$</span>
+                          <input 
+                            type="text" 
+                            value={p.price}
+                            onChange={(e) => {
+                              const newPlans = [...landingSettings.plans];
+                              newPlans[i].price = e.target.value;
+                              setLandingSettings({...landingSettings, plans: newPlans});
+                            }}
+                            className="w-20 bg-transparent border-none text-2xl font-black p-0 outline-none"
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <button 
+                  type="submit"
+                  className="w-full py-4 bg-blue-500 hover:bg-blue-600 text-white rounded-xl font-black uppercase tracking-widest shadow-lg shadow-blue-500/20 transition-all"
+                >
+                  Save Landing Page Changes
+                </button>
+              </form>
+            )}
           </div>
         )}
       </div>

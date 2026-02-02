@@ -1,0 +1,54 @@
+{
+  "hero": {
+    "title": "GOALAI",
+    "subtitle": "The Future of Football Predictions",
+    "video_url": "https://assets.mixkit.co/videos/preview/mixkit-football-player-kicking-ball-in-the-stadium-4659-large.mp4",
+    "image_urls": [
+      "/ronaldovsmessi.jpg",
+      "/auth_bg.jpg",
+      "/dashboard_bg.jpg"
+    ]
+  },
+  "features": [
+    {
+      "title": "Smart Predictions",
+      "description": "Our AI analyzes thousands of data points to provide highly accurate match outcomes."
+    },
+    {
+      "title": "High Confidence Matches",
+      "description": "Identify matches with the highest probability of success using our proprietary algorithms."
+    },
+    {
+      "title": "AI-based Analysis",
+      "description": "Deep dive into team statistics, form, and historical data with our advanced AI engine."
+    }
+  ],
+  "why_us": {
+    "title": "Why Choose GoalAI?",
+    "points": [
+      "90%+ Accuracy Rate",
+      "Real-time Data Updates",
+      "Comprehensive League Coverage",
+      "Expert AI Support"
+    ]
+  },
+  "plans": [
+    {
+      "name": "Basic",
+      "price": "$0",
+      "features": ["Free Predictions", "Live Scores", "Basic Analysis"]
+    },
+    {
+      "name": "Pro",
+      "price": "$29/mo",
+      "features": ["High Confidence Picks", "Advanced Stats", "Priority Support"]
+    },
+    {
+      "name": "Elite",
+      "price": "$99/mo",
+      "features": ["All Features", "Direct API Access", "Expert Betting Strategy"]
+    }
+  ],
+  "about_us": "GoalAI is a leading football prediction platform powered by state-of-the-art machine learning algorithms. We empower bettors with data-driven insights to make informed decisions.",
+  "support_email": "support@goalai.com"
+}

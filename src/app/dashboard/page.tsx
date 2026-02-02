@@ -604,8 +604,12 @@ export default function Dashboard() {
                     ))}
                   </div>
                 ) : (
-                  <div className="bg-black/40 backdrop-blur-md border border-white/5 rounded-3xl p-10 text-center shadow-inner">
-                    <p className="text-gray-600 font-bold italic">{t.no_live}</p>
+                  <div className="bg-black/60 backdrop-blur-md border border-white/5 rounded-[2.5rem] p-12 text-center shadow-2xl">
+                    <div className="w-16 h-16 bg-white/5 rounded-3xl flex items-center justify-center mx-auto mb-4 text-gray-700 border border-white/5">
+                      <Activity size={32} />
+                    </div>
+                    <p className="text-gray-400 font-black text-lg uppercase tracking-wider">{t.no_live || "لا توجد مباريات مباشرة الان"}</p>
+                    <p className="text-gray-600 text-[10px] mt-2 font-bold uppercase tracking-widest">System scanning for live matches...</p>
                   </div>
                 )}
               </section>
@@ -631,8 +635,12 @@ export default function Dashboard() {
                 </button>
               </div>
             ) : (matches.length === 0 && liveMatches.length === 0) ? (
-              <div className="bg-white/5 border border-white/5 rounded-3xl p-12 text-center">
-                <p className="text-gray-500 font-bold">{t.no_predictions}</p>
+              <div className="bg-black/60 backdrop-blur-md border border-white/5 rounded-[2.5rem] p-16 text-center shadow-2xl">
+                <div className="w-16 h-16 bg-white/5 rounded-3xl flex items-center justify-center mx-auto mb-4 text-gray-700 border border-white/5">
+                  <TrendingUp size={32} />
+                </div>
+                <p className="text-gray-400 font-black text-lg uppercase tracking-wider">{t.no_predictions || "لا توجد تنبؤات الان"}</p>
+                <p className="text-gray-600 text-[10px] mt-2 font-bold uppercase tracking-widest">All games for today have concluded</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
