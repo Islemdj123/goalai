@@ -75,6 +75,8 @@ const translations: any = {
     reasoning: "AI Reasoning",
     analyzing: "Analyzing upcoming matches...",
     no_matches: "No scheduled matches found for the upcoming days.",
+    no_live: "No live matches currently in progress.",
+    no_predictions: "No predictions available right now.",
     stats: "Stats",
     avg_scored: "Avg Scored",
     avg_conceded: "Avg Conceded",
@@ -112,6 +114,8 @@ const translations: any = {
     reasoning: "تحليل الذكاء الاصطناعي",
     analyzing: "جاري تحليل المباريات القادمة...",
     no_matches: "لا توجد مباريات مجدولة للأيام القادمة.",
+    no_live: "لا توجد مباريات مباشرة حالياً.",
+    no_predictions: "لا يوجد تنبؤات الان.",
     stats: "إحصائيات",
     avg_scored: "معدل التسجيل",
     avg_conceded: "معدل الاستقبال",
@@ -149,6 +153,8 @@ const translations: any = {
     reasoning: "Analyse IA",
     analyzing: "Analyse des matchs à venir...",
     no_matches: "Aucun match prévu pour les prochains jours.",
+    no_live: "Aucun match en direct pour le moment.",
+    no_predictions: "Pas de prédictions disponibles pour le moment.",
     stats: "Stats",
     avg_scored: "Moy. Marqués",
     avg_conceded: "Moy. Encaissés",
@@ -542,60 +548,66 @@ export default function Dashboard() {
               </motion.div>
             )}
 
-            {view === "matches" && liveMatches.length > 0 && (
+            {view === "matches" && (
               <section className="mb-12">
                 <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
                   <div className="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_15px_rgba(34,197,94,0.8)]" />
                   <span className="text-green-500 drop-shadow-[0_0_8px_rgba(34,197,94,0.4)]">{t.live}</span>
                 </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-6">
-                  {liveMatches.map((live, idx) => (
-                    <div key={idx} className="bg-black/95 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] p-6 flex flex-col gap-6 relative overflow-hidden group hover:border-green-400 transition-all shadow-2xl hover:shadow-green-500/20 active:scale-[0.98]">
-                      <div className="flex justify-between items-start">
-                        <div className="flex flex-col gap-1">
-                          <div className="flex items-center gap-2">
-                            <span className={`relative flex h-2 w-2 ${live.status === 'FINISHED' ? 'hidden' : ''}`}>
-                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                              <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                            </span>
-                            <span className={`text-[10px] font-black uppercase tracking-tighter ${live.status === 'FINISHED' ? 'text-gray-500' : 'text-green-500'}`}>
-                              {live.status === 'FINISHED' ? 'FINISHED' : 'LIVE'}
-                            </span>
+                {liveMatches.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-6">
+                    {liveMatches.map((live, idx) => (
+                      <div key={idx} className="bg-black/95 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] p-6 flex flex-col gap-6 relative overflow-hidden group hover:border-green-400 transition-all shadow-2xl hover:shadow-green-500/20 active:scale-[0.98]">
+                        <div className="flex justify-between items-start">
+                          <div className="flex flex-col gap-1">
+                            <div className="flex items-center gap-2">
+                              <span className={`relative flex h-2 w-2 ${live.status === 'FINISHED' ? 'hidden' : ''}`}>
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                              </span>
+                              <span className={`text-[10px] font-black uppercase tracking-tighter ${live.status === 'FINISHED' ? 'text-gray-500' : 'text-green-500'}`}>
+                                {live.status === 'FINISHED' ? 'FINISHED' : 'LIVE'}
+                              </span>
+                            </div>
+                            <span className="text-[9px] text-gray-500 uppercase tracking-widest font-bold max-w-[150px] truncate mt-1">{live.competition}</span>
                           </div>
-                          <span className="text-[9px] text-gray-500 uppercase tracking-widest font-bold max-w-[150px] truncate mt-1">{live.competition}</span>
+                          <div className="bg-green-500/20 px-3 py-1 rounded-full text-[10px] font-black text-green-500 border border-green-500/20 flex items-center gap-1 shadow-[0_0_15px_rgba(34,197,94,0.1)]">
+                            <Activity size={10} className="animate-pulse" />
+                            <LiveMinute status={live.status} initialMinute={live.minute} />
+                          </div>
                         </div>
-                        <div className="bg-green-500/20 px-3 py-1 rounded-full text-[10px] font-black text-green-500 border border-green-500/20 flex items-center gap-1 shadow-[0_0_15px_rgba(34,197,94,0.1)]">
-                          <Activity size={10} className="animate-pulse" />
-                          <LiveMinute status={live.status} initialMinute={live.minute} />
+
+                        <div className="flex items-center justify-between gap-4">
+                          <div className="flex flex-col items-center gap-3 flex-1 min-w-0">
+                            <div className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center p-3 group-hover:bg-white/10 transition-colors">
+                              <img src={live.home_logo} className="w-full h-full object-contain" alt="" onError={(e) => e.currentTarget.src = 'https://via.placeholder.com/50?text=?'} />
+                            </div>
+                            <span className="text-[11px] font-bold text-center line-clamp-2 h-8 leading-tight w-full">{live.home_team}</span>
+                          </div>
+
+                          <div className="flex flex-col items-center justify-center">
+                            <div className="text-4xl font-black flex items-center gap-4 tabular-nums text-white">
+                              <span>{live.home_score}</span>
+                              <span className="text-blue-500 font-black">-</span>
+                              <span>{live.away_score}</span>
+                            </div>
+                          </div>
+
+                          <div className="flex flex-col items-center gap-3 flex-1 min-w-0">
+                            <div className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center p-3 group-hover:bg-white/10 transition-colors">
+                              <img src={live.away_logo} className="w-full h-full object-contain" alt="" onError={(e) => e.currentTarget.src = 'https://via.placeholder.com/50?text=?'} />
+                            </div>
+                            <span className="text-[11px] font-bold text-center line-clamp-2 h-8 leading-tight w-full">{live.away_team}</span>
+                          </div>
                         </div>
                       </div>
-
-                      <div className="flex items-center justify-between gap-4">
-                        <div className="flex flex-col items-center gap-3 flex-1 min-w-0">
-                          <div className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center p-3 group-hover:bg-white/10 transition-colors">
-                            <img src={live.home_logo} className="w-full h-full object-contain" alt="" onError={(e) => e.currentTarget.src = 'https://via.placeholder.com/50?text=?'} />
-                          </div>
-                          <span className="text-[11px] font-bold text-center line-clamp-2 h-8 leading-tight w-full">{live.home_team}</span>
-                        </div>
-
-                        <div className="flex flex-col items-center justify-center">
-                          <div className="text-4xl font-black flex items-center gap-4 tabular-nums text-white">
-                            <span>{live.home_score}</span>
-                            <span className="text-blue-500 font-black">-</span>
-                            <span>{live.away_score}</span>
-                          </div>
-                        </div>
-
-                        <div className="flex flex-col items-center gap-3 flex-1 min-w-0">
-                          <div className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center p-3 group-hover:bg-white/10 transition-colors">
-                            <img src={live.away_logo} className="w-full h-full object-contain" alt="" onError={(e) => e.currentTarget.src = 'https://via.placeholder.com/50?text=?'} />
-                          </div>
-                          <span className="text-[11px] font-bold text-center line-clamp-2 h-8 leading-tight w-full">{live.away_team}</span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="bg-white/5 border border-white/5 rounded-3xl p-8 text-center">
+                    <p className="text-gray-500 font-bold">{t.no_live}</p>
+                  </div>
+                )}
               </section>
             )}
 
@@ -619,8 +631,8 @@ export default function Dashboard() {
                 </button>
               </div>
             ) : matches.length === 0 ? (
-              <div className="text-center py-20">
-                <p className="text-gray-500">{t.no_matches}</p>
+              <div className="bg-white/5 border border-white/5 rounded-3xl p-12 text-center">
+                <p className="text-gray-500 font-bold">{t.no_predictions}</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">

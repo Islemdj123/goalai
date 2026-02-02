@@ -395,13 +395,16 @@ def main():
 
     with col_main:
         # LIVE SECTION
-        if nav_view == "Home Center" and live_matches:
+        if nav_view == "Home Center":
             st.markdown("### 🏟️ Live Now")
-            for m in live_matches:
-                h_logo = m.get('home_logo', '')
-                a_logo = m.get('away_logo', '')
-                
-                live_html = f"""<div class="match-card" style="border-left: 5px solid #ff4b2b;">
+            if not live_matches:
+                st.info("No live matches currently in progress.")
+            else:
+                for m in live_matches:
+                    h_logo = m.get('home_logo', '')
+                    a_logo = m.get('away_logo', '')
+                    
+                    live_html = f"""<div class="match-card" style="border-left: 5px solid #ff4b2b;">
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
 <div style="display: flex; flex-direction: column;">
     <span class="live-indicator">LIVE</span>
@@ -419,14 +422,14 @@ def main():
 </div>
 </div>
 </div>""".strip()
-                st.markdown(live_html, unsafe_allow_html=True)
+                    st.markdown(live_html, unsafe_allow_html=True)
             st.markdown("---")
 
         # UPCOMING SECTION
         st.markdown("### 📅 Upcoming & Predictions")
         processed_count = 0
         if not upcoming_matches:
-            st.info("No upcoming matches found in current supported tiers.")
+            st.info("No predictions available right now.")
         else:
             for p in upcoming_matches:
                 h_name, a_name = p["home_team"], p["away_team"]
