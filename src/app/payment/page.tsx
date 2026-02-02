@@ -16,6 +16,8 @@ const translations: any = {
     upload: "Upload Receipt Screenshot",
     select_img: "Select an image...",
     tx_id: "Transaction ID / Reference",
+    account_label: "Your Bank/Wallet Account Number",
+    account_placeholder: "Enter your account number here",
     amount_label: "Amount to Recharge (DZD / USDT)",
     amount_placeholder: "Enter amount",
     tx_placeholder: "Paste reference here",
@@ -83,6 +85,8 @@ const translations: any = {
     upload: "رفع صورة وصل الدفع",
     select_img: "اختر صورة...",
     tx_id: "رقم العملية / المرجع",
+    account_label: "رقم حسابك (الذي قمت بالدفع منه)",
+    account_placeholder: "أدخل رقم حسابك هنا",
     amount_label: "المبلغ المراد شحنه (د.ج / USDT)",
     amount_placeholder: "أدخل المبلغ هنا",
     tx_placeholder: "أدخل المرجع هنا",
@@ -150,6 +154,8 @@ const translations: any = {
     upload: "Télécharger la capture du reçu",
     select_img: "Sélectionner une image...",
     tx_id: "ID de transaction / Référence",
+    account_label: "Votre numéro de compte (Banque/Wallet)",
+    account_placeholder: "Entrez votre numéro de compte ici",
     amount_label: "Montant à recharger (DZD / USDT)",
     amount_placeholder: "Entrez le montant",
     tx_placeholder: "Collez la référence ici",
@@ -215,9 +221,11 @@ export default function Payment() {
   const [lang, setLang] = useState<"en" | "ar" | "fr">("en");
   const [selectedPlan, setSelectedPlan] = useState<any>(null);
   const [txId, setTxId] = useState("");
+  const [paymentAccount, setPaymentAccount] = useState("");
   const [amount, setAmount] = useState("");
   const [receipt, setReceipt] = useState<File | null>(null);
   const [settings, setSettings] = useState({ binance_id: "Loading...", baridimob_id: "Loading..." });
+  const [landingSettings, setLandingSettings] = useState<any>(null);
   const [submitting, setSubmitting] = useState(false);
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
@@ -230,9 +238,15 @@ export default function Payment() {
       .then(res => res.json())
       .then(data => setSettings(data))
       .catch(err => console.error("Failed to load settings"));
+
+    fetch(`${API_BASE}/landing/settings`)
+      .then(res => res.json())
+      .then(data => setLandingSettings(data))
+      .catch(err => console.error("Failed to load landing settings"));
   }, []);
 
   const t = translations[lang];
+  const dynamicPlans = landingSettings?.plans || t.plans;
 
   const handleSubmit = async () => {
     const token = localStorage.getItem("token");
@@ -243,7 +257,7 @@ export default function Payment() {
       return;
     }
     
-    if (!txId || !receipt || !amount) {
+    if (!txId || !receipt || !amount || !paymentAccount) {
       setErrorMsg(t.alert_missing);
       setStatus("error");
       return;
@@ -257,6 +271,7 @@ export default function Payment() {
     formData.append("plan_id", selectedPlan.id);
     formData.append("tx_id", txId);
     formData.append("amount", amount);
+    formData.append("payment_account", paymentAccount);
     formData.append("receipt", receipt);
 
     try {
@@ -376,6 +391,17 @@ export default function Payment() {
             </div>
 
             <div className="space-y-2">
+              <label className="text-[10px] uppercase tracking-widest text-gray-500 font-black px-1">{t.account_label}</label>
+              <input 
+                type="text"
+                value={paymentAccount}
+                onChange={(e) => setPaymentAccount(e.target.value)}
+                className="w-full bg-white/[0.03] border border-white/5 rounded-2xl p-5 focus:outline-none focus:border-blue-500/50 focus:bg-white/[0.05] transition-all text-white font-medium"
+                placeholder={t.account_placeholder}
+              />
+            </div>
+
+            <div className="space-y-2">
               <label className="text-[10px] uppercase tracking-widest text-gray-500 font-black px-1">{t.tx_id}</label>
               <input 
                 type="text"
@@ -421,7 +447,7 @@ export default function Payment() {
       </div>
 
       <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-        {t.plans.map((plan: any) => (
+        {dynamicPlans.map((plan: any) => (
           <motion.div
             key={plan.id}
             initial={{ opacity: 0, scale: 0.95 }}

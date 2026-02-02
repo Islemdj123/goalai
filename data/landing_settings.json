@@ -30,23 +30,75 @@
       "Real-time Data Updates",
       "Comprehensive League Coverage",
       "Expert AI Support"
-    ]
+    ],
+    "image_url": "/ronaldovsmessi.jpg"
   },
   "plans": [
     {
-      "name": "Basic",
-      "price": "$0",
-      "features": ["Free Predictions", "Live Scores", "Basic Analysis"]
+      "id": "daily",
+      "name": "Daily Access",
+      "price_usdt": "5 USDT",
+      "price_dzd": "1,250 DZD",
+      "duration": "24 Hours",
+      "days": 1,
+      "features": [
+        "10+ AI Predictions",
+        "High Confidence Tips",
+        "Instant Access"
+      ]
     },
     {
-      "name": "Pro",
-      "price": "$29/mo",
-      "features": ["High Confidence Picks", "Advanced Stats", "Priority Support"]
+      "id": "5days",
+      "name": "5 Days Access",
+      "price_usdt": "20 USDT",
+      "price_dzd": "5,000 DZD",
+      "duration": "5 Days",
+      "days": 5,
+      "features": [
+        "Full AI Access",
+        "High Accuracy",
+        "Advanced Stats"
+      ]
     },
     {
-      "name": "Elite",
-      "price": "$99/mo",
-      "features": ["All Features", "Direct API Access", "Expert Betting Strategy"]
+      "id": "10days",
+      "name": "10 Days Access",
+      "price_usdt": "40 USDT",
+      "price_dzd": "10,000 DZD",
+      "duration": "10 Days",
+      "days": 10,
+      "features": [
+        "Priority Support",
+        "All AI Predictions",
+        "Best Success Rate"
+      ],
+      "popular": true
+    },
+    {
+      "id": "monthly",
+      "name": "Monthly Elite",
+      "price_usdt": "120 USDT",
+      "price_dzd": "30,000 DZD",
+      "duration": "30 Days",
+      "days": 30,
+      "features": [
+        "Full Month Access",
+        "VIP Analysis",
+        "24/7 Support"
+      ]
+    },
+    {
+      "id": "yearly",
+      "name": "Yearly Pro",
+      "price_usdt": "900 USDT",
+      "price_dzd": "225,000 DZD",
+      "duration": "365 Days",
+      "days": 365,
+      "features": [
+        "Best Value",
+        "All Premium Features",
+        "Priority Predictions"
+      ]
     }
   ],
   "about_us": "GoalAI is a leading football prediction platform powered by state-of-the-art machine learning algorithms. We empower bettors with data-driven insights to make informed decisions.",

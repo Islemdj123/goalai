@@ -54,6 +54,7 @@ class TransactionOut(BaseModel):
     user_email: str
     amount: float
     txid: str
+    payment_account: Optional[str] = None
     receipt_path: str
     status: str
     created_at: datetime

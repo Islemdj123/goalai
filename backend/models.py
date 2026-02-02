@@ -13,6 +13,7 @@ class User(Base):
     payment_status = Column(String, default="unpaid")
     plan = Column(String, nullable=True)
     txid = Column(String, nullable=True)
+    payment_account = Column(String, nullable=True)
     receipt_path = Column(String, nullable=True)
     expiry_date = Column(String, nullable=True)
     balance = Column(Float, default=0.0)
@@ -25,6 +26,7 @@ class Transaction(Base):
     user_email = Column(String, index=True)
     amount = Column(Float)
     txid = Column(String)
+    payment_account = Column(String, nullable=True)
     receipt_path = Column(String)
     status = Column(String, default="pending") # pending, approved, rejected
     created_at = Column(DateTime, default=datetime.utcnow)

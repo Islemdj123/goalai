@@ -19,12 +19,13 @@ export default function Plans({ settings }: { settings: any }) {
             <motion.div
               key={idx}
               whileHover={{ scale: 1.02 }}
-              className={`p-10 rounded-[3rem] border transition-all ${idx === 1 ? 'bg-blue-600 border-blue-400 shadow-2xl shadow-blue-600/20' : 'bg-white/5 border-white/10 hover:border-white/20'}`}
+              className={`p-10 rounded-[3rem] border transition-all ${plan.popular ? 'bg-blue-600 border-blue-400 shadow-2xl shadow-blue-600/20' : 'bg-white/5 border-white/10 hover:border-white/20'}`}
             >
               <h3 className="text-2xl font-black mb-2">{plan.name}</h3>
-              <div className="flex items-baseline gap-1 mb-8">
-                <span className="text-5xl font-black">{plan.price}</span>
-                {plan.price !== "$0" && <span className="text-sm opacity-60">/month</span>}
+              <div className="flex flex-col mb-8">
+                <span className="text-4xl font-black">{plan.price_usdt}</span>
+                <span className="text-xl font-bold opacity-60">{plan.price_dzd}</span>
+                <span className="text-xs opacity-50 mt-1 uppercase tracking-widest">{plan.duration}</span>
               </div>
               
               <ul className="space-y-4 mb-10">
@@ -38,7 +39,7 @@ export default function Plans({ settings }: { settings: any }) {
 
               <Link
                 href="/register"
-                className={`block w-full text-center py-4 rounded-2xl font-black text-sm transition-all ${idx === 1 ? 'bg-white text-blue-600 hover:bg-gray-100' : 'bg-blue-600 text-white hover:bg-blue-700'}`}
+                className={`block w-full text-center py-4 rounded-2xl font-black text-sm transition-all ${plan.popular ? 'bg-white text-blue-600 hover:bg-gray-100' : 'bg-blue-600 text-white hover:bg-blue-700'}`}
               >
                 Choose {plan.name}
               </Link>

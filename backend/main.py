@@ -18,7 +18,9 @@ app = FastAPI(title="AI Football Predictor API")
 
 # Mount static files for receipts
 os.makedirs("data/receipts", exist_ok=True)
+os.makedirs("backend/uploads/landing", exist_ok=True)
 app.mount("/data", StaticFiles(directory="data"), name="data")
+app.mount("/uploads", StaticFiles(directory="backend/uploads"), name="uploads")
 
 # Enable CORS for Next.js
 app.add_middleware(
@@ -172,6 +174,7 @@ async def submit_payment(
     plan_id: str = Form(...),
     tx_id: str = Form(...),
     amount: float = Form(...),
+    payment_account: str = Form(None),
     receipt: UploadFile = File(...),
     token: str = Depends(oauth2_scheme),
     db: Session = Depends(get_db)
@@ -200,6 +203,7 @@ async def submit_payment(
         user.plan = plan_id
         user.pending_amount = amount
         user.txid = f"{plan_id} | {tx_id}"
+        user.payment_account = payment_account
         user.receipt_path = f"data/receipts/{file_name}"
         
         # Log transaction history
@@ -207,6 +211,7 @@ async def submit_payment(
             user_email=email,
             amount=amount,
             txid=f"{plan_id} | {tx_id}",
+            payment_account=payment_account,
             receipt_path=f"data/receipts/{file_name}",
             status="pending"
         )
@@ -250,6 +255,7 @@ def admin_get_users(admin=Depends(get_admin_user), db: Session = Depends(get_db)
         "pending_amount": u.pending_amount,
         "expiry_date": u.expiry_date,
         "txid": u.txid,
+        "payment_account": u.payment_account,
         "receipt_path": u.receipt_path
     } for u in users]
 
@@ -407,3 +413,18 @@ def update_landing_settings(settings: dict, admin=Depends(get_admin_user)):
     with open(LANDING_SETTINGS_FILE, "w") as f:
         json.dump(settings, f, indent=4)
     return {"status": "success"}
+
+@app.post("/admin/upload-media")
+async def upload_media(file: UploadFile = File(...), admin=Depends(get_admin_user)):
+    upload_dir = "backend/uploads/landing"
+    os.makedirs(upload_dir, exist_ok=True)
+    
+    file_ext = file.filename.split('.')[-1]
+    file_name = f"media_{int(time.time())}.{file_ext}"
+    file_path = os.path.join(upload_dir, file_name)
+    
+    with open(file_path, "wb") as buffer:
+        content = await file.read()
+        buffer.write(content)
+        
+    return {"url": f"/uploads/landing/{file_name}"}

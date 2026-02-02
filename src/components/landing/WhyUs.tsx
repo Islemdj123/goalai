@@ -4,6 +4,8 @@ import { CheckCircle2 } from "lucide-react";
 
 export default function WhyUs({ settings }: { settings: any }) {
   const why_us = settings?.why_us || {};
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+  const imageUrl = why_us.image_url?.startsWith("/") ? `${API_BASE}${why_us.image_url}` : (why_us.image_url || "/ronaldovsmessi.jpg");
 
   return (
     <section id="about" className="py-24 bg-[#050505] relative">
@@ -32,7 +34,7 @@ export default function WhyUs({ settings }: { settings: any }) {
           
           <div className="flex-1 relative">
             <div className="relative z-10 rounded-[3rem] overflow-hidden border border-white/10 shadow-2xl">
-              <img src="/ronaldovsmessi.jpg" alt="GoalAI Analysis" className="w-full grayscale hover:grayscale-0 transition-all duration-700" />
+              <img src={imageUrl} alt="GoalAI Analysis" className="w-full grayscale hover:grayscale-0 transition-all duration-700" />
             </div>
             <div className="absolute -top-10 -right-10 w-40 h-40 bg-blue-600/20 blur-[100px] rounded-full" />
             <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-blue-600/20 blur-[100px] rounded-full" />

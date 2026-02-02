@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { 
   Users, Settings, DollarSign, Check, X, Edit, 
   Search, Shield, LogOut, RefreshCw, Eye, Calendar,
-  Trash2, Ban, Layout
+  Trash2, Ban, Layout, Video
 } from "lucide-react";
 
 interface AdminUser {
@@ -19,6 +19,7 @@ interface AdminUser {
   pending_amount: number;
   expiry_date: string;
   txid: string;
+  payment_account: string;
   receipt_path: string;
 }
 
@@ -27,6 +28,7 @@ interface Transaction {
   user_email: string;
   amount: number;
   txid: string;
+  payment_account: string;
   receipt_path: string;
   status: string;
   created_at: string;
@@ -118,6 +120,13 @@ export default function AdminDashboard() {
     }
   };
 
+  const getFullUrl = (path: string) => {
+    if (!path) return "";
+    if (path.startsWith("http")) return path;
+    const cleanPath = path.startsWith("/") ? path.substring(1) : path;
+    return `${API_BASE}/${cleanPath}`;
+  };
+
   const updateLandingSettings = async (e: React.FormEvent) => {
     e.preventDefault();
     const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
@@ -134,18 +143,41 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleMediaUpload = async (e: React.ChangeEvent<HTMLInputElement>, target: string) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await fetch(`${API_BASE}/admin/upload-media`, {
+        method: "POST",
+        headers: { "Authorization": `Bearer ${token}` },
+        body: formData
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const updatedSettings = { ...landingSettings };
+        if (target === "hero_video") updatedSettings.hero.video_url = data.url;
+        setLandingSettings(updatedSettings);
+        alert("Media uploaded successfully!");
+      }
+    } catch (err) { console.error(err); }
+  };
+
   useEffect(() => {
     checkAdmin();
     fetchLandingSettings();
   }, []);
 
-  const handleApprove = async (email: string, plan: string) => {
+  const handleApprove = async (email: string, plan_id: string) => {
     const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-    let days = 1;
-    if (plan === "5-day") days = 5;
-    else if (plan === "10-day") days = 10;
-    else if (plan === "monthly") days = 30;
-    else if (plan === "yearly") days = 365;
+    
+    // Find plan in landing settings to get days
+    const plan = landingSettings?.plans?.find((p: any) => p.id === plan_id);
+    let days = plan?.days || 1;
 
     const formData = new FormData();
     formData.append("email", email);
@@ -418,6 +450,13 @@ export default function AdminDashboard() {
                         </td>
                         <td className="px-6 py-4">
                           <div className="text-xs font-bold text-white/80">{u.plan || "N/A"}</div>
+                          {u.payment_status === "pending" && (
+                            <div className="text-[10px] text-blue-400 font-bold mt-1">
+                              {u.payment_account || "No Account"}
+                              <br/>
+                              {u.txid || "No TX ID"}
+                            </div>
+                          )}
                           <div className="text-[10px] text-gray-500">Exp: {u.expiry_date?.split('T')[0] || "Never"}</div>
                         </td>
                         <td className="px-6 py-4 text-right space-x-2">
@@ -505,7 +544,7 @@ export default function AdminDashboard() {
                       <th className="px-6 py-4">Date</th>
                       <th className="px-6 py-4">User</th>
                       <th className="px-6 py-4">Amount</th>
-                      <th className="px-6 py-4">TX ID</th>
+                      <th className="px-6 py-4">Account/TX ID</th>
                       <th className="px-6 py-4">Status</th>
                       <th className="px-6 py-4 text-right">Actions</th>
                     </tr>
@@ -522,8 +561,9 @@ export default function AdminDashboard() {
                         <td className="px-6 py-4 font-mono text-blue-500 font-bold">
                           ${tx.amount?.toFixed(2)}
                         </td>
-                        <td className="px-6 py-4 text-xs text-gray-400">
-                          {tx.txid}
+                        <td className="px-6 py-4">
+                          <div className="text-xs text-white font-bold">{tx.payment_account || "N/A"}</div>
+                          <div className="text-[10px] text-gray-500 mt-1">{tx.txid}</div>
                         </td>
                         <td className="px-6 py-4">
                           <span className={`px-2 py-1 rounded-lg text-[10px] font-black uppercase border ${
@@ -621,13 +661,85 @@ export default function AdminDashboard() {
                       />
                     </div>
                     <div>
-                      <label className="block text-[10px] uppercase font-black text-gray-500 mb-2">Hero Video URL</label>
-                      <input 
-                        type="text" 
-                        value={landingSettings.hero.video_url}
-                        onChange={(e) => setLandingSettings({...landingSettings, hero: {...landingSettings.hero, video_url: e.target.value}})}
-                        className="w-full bg-black/50 border border-white/5 rounded-xl py-3 px-4 focus:border-blue-500/50 outline-none transition-all"
-                      />
+                      <label className="block text-[10px] uppercase font-black text-gray-500 mb-2">Hero Video (URL or Upload)</label>
+                      <div className="flex gap-2">
+                        <input 
+                          type="text" 
+                          value={landingSettings.hero.video_url}
+                          onChange={(e) => setLandingSettings({...landingSettings, hero: {...landingSettings.hero, video_url: e.target.value}})}
+                          className="flex-1 bg-black/50 border border-white/5 rounded-xl py-3 px-4 focus:border-blue-500/50 outline-none transition-all"
+                        />
+                        <div className="relative">
+                          <input 
+                            type="file" 
+                            accept="video/*"
+                            onChange={(e) => handleMediaUpload(e, "hero_video")}
+                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                          />
+                          <button type="button" className="h-full px-4 bg-blue-500 hover:bg-blue-600 text-white rounded-xl border border-blue-500/50 transition-all flex items-center gap-2 font-bold whitespace-nowrap">
+                            <Video size={16} />
+                            Upload Video
+                          </button>
+                        </div>
+                      </div>
+                      {landingSettings.hero.video_url && (
+                        <div className="mt-2 rounded-lg overflow-hidden border border-white/10 aspect-video w-full max-w-[200px]">
+                          <video 
+                            src={getFullUrl(landingSettings.hero.video_url)} 
+                            className="w-full h-full object-cover"
+                            muted
+                            loop
+                            autoPlay
+                          />
+                        </div>
+                      )}
+                    </div>
+                    <div>
+                      <label className="block text-[10px] uppercase font-black text-gray-500 mb-2">Background Images</label>
+                      <div className="grid grid-cols-2 gap-2 mb-2">
+                        {landingSettings.hero.image_urls?.map((url: string, idx: number) => (
+                          <div key={idx} className="relative group">
+                            <img src={getFullUrl(url)} className="w-full h-20 object-cover rounded-lg border border-white/10" />
+                            <button 
+                              type="button"
+                              onClick={() => {
+                                const newImages = landingSettings.hero.image_urls.filter((_: any, i: number) => i !== idx);
+                                setLandingSettings({...landingSettings, hero: {...landingSettings.hero, image_urls: newImages}});
+                              }}
+                              className="absolute top-1 right-1 bg-red-500 p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                              <X size={10} />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="relative">
+                        <input 
+                          type="file" 
+                          accept="image/*"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (!file) return;
+                            const token = localStorage.getItem("token");
+                            const formData = new FormData();
+                            formData.append("file", file);
+                            const res = await fetch(`${API_BASE}/admin/upload-media`, {
+                              method: "POST",
+                              headers: { "Authorization": `Bearer ${token}` },
+                              body: formData
+                            });
+                            if (res.ok) {
+                              const data = await res.json();
+                              const newImages = [...(landingSettings.hero.image_urls || []), data.url];
+                              setLandingSettings({...landingSettings, hero: {...landingSettings.hero, image_urls: newImages}});
+                            }
+                          }}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                        />
+                        <button type="button" className="w-full py-2 bg-white/5 hover:bg-white/10 rounded-xl border border-white/5 transition-all text-[10px] font-black uppercase">
+                          + Add Image
+                        </button>
+                      </div>
                     </div>
                   </div>
                   <div>
@@ -643,14 +755,51 @@ export default function AdminDashboard() {
                 {/* Why Us Section */}
                 <div className="p-6 bg-white/5 rounded-2xl border border-white/5 space-y-4">
                   <h3 className="text-blue-500 font-bold uppercase tracking-widest text-xs">Why Choose Us</h3>
-                  <div>
-                    <label className="block text-[10px] uppercase font-black text-gray-500 mb-2">Section Title</label>
-                    <input 
-                      type="text" 
-                      value={landingSettings.why_us.title}
-                      onChange={(e) => setLandingSettings({...landingSettings, why_us: {...landingSettings.why_us, title: e.target.value}})}
-                      className="w-full bg-black/50 border border-white/5 rounded-xl py-3 px-4 focus:border-blue-500/50 outline-none transition-all"
-                    />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-[10px] uppercase font-black text-gray-500 mb-2">Section Title</label>
+                      <input 
+                        type="text" 
+                        value={landingSettings.why_us.title}
+                        onChange={(e) => setLandingSettings({...landingSettings, why_us: {...landingSettings.why_us, title: e.target.value}})}
+                        className="w-full bg-black/50 border border-white/5 rounded-xl py-3 px-4 focus:border-blue-500/50 outline-none transition-all"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] uppercase font-black text-gray-500 mb-2">Section Image</label>
+                      <div className="flex gap-4 items-center">
+                        <img 
+                          src={getFullUrl(landingSettings.why_us.image_url)} 
+                          className="w-20 h-20 object-cover rounded-xl border border-white/10" 
+                        />
+                        <div className="relative flex-1">
+                          <input 
+                            type="file" 
+                            accept="image/*"
+                            onChange={async (e) => {
+                              const file = e.target.files?.[0];
+                              if (!file) return;
+                              const token = localStorage.getItem("token");
+                              const formData = new FormData();
+                              formData.append("file", file);
+                              const res = await fetch(`${API_BASE}/admin/upload-media`, {
+                                method: "POST",
+                                headers: { "Authorization": `Bearer ${token}` },
+                                body: formData
+                              });
+                              if (res.ok) {
+                                const data = await res.json();
+                                setLandingSettings({...landingSettings, why_us: {...landingSettings.why_us, image_url: data.url}});
+                              }
+                            }}
+                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                          />
+                          <button type="button" className="w-full py-3 bg-white/5 hover:bg-white/10 rounded-xl border border-white/5 transition-all text-[10px] font-black uppercase">
+                            Change Image
+                          </button>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <label className="block text-[10px] uppercase font-black text-gray-500 mb-2">Points (one per line)</label>
@@ -695,32 +844,133 @@ export default function AdminDashboard() {
 
                 {/* Plans Section */}
                 <div className="p-6 bg-white/5 rounded-2xl border border-white/5 space-y-4">
-                  <h3 className="text-blue-500 font-bold uppercase tracking-widest text-xs">Plans & Pricing</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="flex justify-between items-center">
+                    <h3 className="text-blue-500 font-bold uppercase tracking-widest text-xs">Plans & Pricing</h3>
+                    <button 
+                      type="button"
+                      onClick={() => {
+                        const newPlans = [...landingSettings.plans, {
+                          id: "new_" + Date.now(),
+                          name: "New Plan",
+                          price_usdt: "0 USDT",
+                          price_dzd: "0 DZD",
+                          duration: "30 Days",
+                          days: 30,
+                          features: ["Feature 1"]
+                        }];
+                        setLandingSettings({...landingSettings, plans: newPlans});
+                      }}
+                      className="px-3 py-1 bg-blue-500/10 text-blue-500 rounded-lg text-[10px] font-black uppercase hover:bg-blue-500/20"
+                    >
+                      + Add Plan
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {landingSettings.plans.map((p: any, i: number) => (
-                      <div key={i} className="p-4 bg-black/50 rounded-xl border border-white/5 space-y-2">
-                        <input 
-                          type="text" 
-                          value={p.name}
-                          onChange={(e) => {
-                            const newPlans = [...landingSettings.plans];
-                            newPlans[i].name = e.target.value;
+                      <div key={i} className="p-6 bg-black/50 rounded-2xl border border-white/5 space-y-4 relative group">
+                        <button 
+                          type="button"
+                          onClick={() => {
+                            const newPlans = landingSettings.plans.filter((_: any, idx: number) => idx !== i);
                             setLandingSettings({...landingSettings, plans: newPlans});
                           }}
-                          className="w-full bg-transparent border-none font-bold text-blue-500 p-0 outline-none"
-                        />
-                        <div className="flex items-center gap-1">
-                          <span className="text-xs text-gray-500">$</span>
-                          <input 
-                            type="text" 
-                            value={p.price}
+                          className="absolute top-4 right-4 text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-[10px] uppercase font-black text-gray-500">Plan Name</label>
+                            <input 
+                              type="text" 
+                              value={p.name}
+                              onChange={(e) => {
+                                const newPlans = [...landingSettings.plans];
+                                newPlans[i].name = e.target.value;
+                                setLandingSettings({...landingSettings, plans: newPlans});
+                              }}
+                              className="w-full bg-white/5 border border-white/5 rounded-lg py-2 px-3 text-sm focus:border-blue-500/50 outline-none"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[10px] uppercase font-black text-gray-500">Duration (Text)</label>
+                            <input 
+                              type="text" 
+                              value={p.duration}
+                              onChange={(e) => {
+                                const newPlans = [...landingSettings.plans];
+                                newPlans[i].duration = e.target.value;
+                                setLandingSettings({...landingSettings, plans: newPlans});
+                              }}
+                              className="w-full bg-white/5 border border-white/5 rounded-lg py-2 px-3 text-sm focus:border-blue-500/50 outline-none"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[10px] uppercase font-black text-gray-500">Duration (Days Number)</label>
+                            <input 
+                              type="number" 
+                              value={p.days}
+                              onChange={(e) => {
+                                const newPlans = [...landingSettings.plans];
+                                newPlans[i].days = parseInt(e.target.value);
+                                setLandingSettings({...landingSettings, plans: newPlans});
+                              }}
+                              className="w-full bg-white/5 border border-white/5 rounded-lg py-2 px-3 text-sm focus:border-blue-500/50 outline-none"
+                            />
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-[10px] uppercase font-black text-gray-500">Price USDT</label>
+                            <input 
+                              type="text" 
+                              value={p.price_usdt}
+                              onChange={(e) => {
+                                const newPlans = [...landingSettings.plans];
+                                newPlans[i].price_usdt = e.target.value;
+                                setLandingSettings({...landingSettings, plans: newPlans});
+                              }}
+                              className="w-full bg-white/5 border border-white/5 rounded-lg py-2 px-3 text-sm focus:border-blue-500/50 outline-none"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[10px] uppercase font-black text-gray-500">Price DZD</label>
+                            <input 
+                              type="text" 
+                              value={p.price_dzd}
+                              onChange={(e) => {
+                                const newPlans = [...landingSettings.plans];
+                                newPlans[i].price_dzd = e.target.value;
+                                setLandingSettings({...landingSettings, plans: newPlans});
+                              }}
+                              className="w-full bg-white/5 border border-white/5 rounded-lg py-2 px-3 text-sm focus:border-blue-500/50 outline-none"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-[10px] uppercase font-black text-gray-500 mb-1">Features (one per line)</label>
+                          <textarea 
+                            value={p.features.join("\n")}
                             onChange={(e) => {
                               const newPlans = [...landingSettings.plans];
-                              newPlans[i].price = e.target.value;
+                              newPlans[i].features = e.target.value.split("\n");
                               setLandingSettings({...landingSettings, plans: newPlans});
                             }}
-                            className="w-20 bg-transparent border-none text-2xl font-black p-0 outline-none"
+                            className="w-full bg-white/5 border border-white/5 rounded-lg py-2 px-3 text-xs focus:border-blue-500/50 outline-none h-24"
                           />
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <input 
+                            type="checkbox" 
+                            checked={p.popular}
+                            onChange={(e) => {
+                              const newPlans = [...landingSettings.plans];
+                              newPlans[i].popular = e.target.checked;
+                              setLandingSettings({...landingSettings, plans: newPlans});
+                            }}
+                            id={`pop-${i}`}
+                          />
+                          <label htmlFor={`pop-${i}`} className="text-[10px] uppercase font-black text-gray-500">Mark as Popular</label>
                         </div>
                       </div>
                     ))}
@@ -751,9 +1001,9 @@ export default function AdminDashboard() {
             </button>
             <div className="p-4 overflow-auto max-h-[80vh]">
               <img 
-                src={`${API_BASE}/${selectedReceipt.path}`} 
+                src={getFullUrl(selectedReceipt.path)} 
                 alt="Payment Receipt" 
-                className="w-full h-auto rounded-xl"
+                className="w-full h-auto rounded-xl shadow-2xl"
               />
             </div>
             <div className="mt-4 p-4 text-center border-t border-white/5">
