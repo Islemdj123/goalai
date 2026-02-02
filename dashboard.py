@@ -203,6 +203,8 @@ def main():
         st.session_state.authenticated = False
         st.rerun()
 
+    # Determine access level
+    has_access = (db_user.status == "paid" and db_user.has_paid) or (db_user.balance > 0) or st.session_state.admin_access
     st.session_state.payment_status = db_user.status or "unpaid"
     
     nav_view = st.sidebar.radio("View", ["Home Center", "Predictions Only", "Profile"])
@@ -428,7 +430,7 @@ def main():
         # UPCOMING SECTION
         st.markdown("### 📅 Upcoming & Predictions")
         processed_count = 0
-        if not upcoming_matches:
+        if not upcoming_matches and not live_matches:
             st.info("No predictions available right now.")
         else:
             for p in upcoming_matches:
@@ -445,7 +447,7 @@ def main():
                 badge = f'<span class="high-badge">🔥 HIGH CONFIDENCE</span>' if conf else ""
                 
                 # Check Payment Status for Content (Admin bypasses this)
-                if st.session_state.payment_status == "paid" or st.session_state.admin_access:
+                if has_access:
                     max_prob = p["prob_val"]
                     # Calculate Confidence Color
                     conf_color = "#00d4ff" if max_prob < 0.7 else "#00ff88" if max_prob < 0.85 else "#ffbc00"
@@ -512,7 +514,7 @@ def main():
                 with st.container():
                     st.markdown(upcoming_html, unsafe_allow_html=True)
                     
-                    if st.session_state.payment_status == "paid" or st.session_state.admin_access:
+                    if has_access:
                         with st.expander("🔍 Match Analysis & Prediction Logic"):
                             st.markdown(f"### Reasoning for {win_logo_html} {p['winner']}", unsafe_allow_html=True)
                             col_a, col_b = st.columns(2)

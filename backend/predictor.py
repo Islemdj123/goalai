@@ -29,7 +29,7 @@ def get_predictions(lang="en"):
     with open(config.BTTS_MODEL_PATH, "rb") as f: btts_model = pickle.load(f)
     with open(config.TEAM_STATS_PATH, "rb") as f: team_stats = pickle.load(f)
 
-    url = f"{config.BASE_URL}/matches?status=SCHEDULED"
+    url = f"{config.BASE_URL}/matches?status=SCHEDULED,LIVE,IN_PLAY,PAUSED"
     headers = {"X-Auth-Token": config.API_TOKEN}
     
     try:

@@ -630,7 +630,7 @@ export default function Dashboard() {
                   <RefreshCw size={18} /> {t.retry}
                 </button>
               </div>
-            ) : matches.length === 0 ? (
+            ) : (matches.length === 0 && liveMatches.length === 0) ? (
               <div className="bg-white/5 border border-white/5 rounded-3xl p-12 text-center">
                 <p className="text-gray-500 font-bold">{t.no_predictions}</p>
               </div>
