@@ -22,21 +22,24 @@ async def remove_api_prefix(request, call_next):
         request.scope["path"] = request.url.path.replace("/api", "", 1)
     return await call_next(request)
 
-# Mount static files for receipts
+# Mount static files safely
 os.makedirs("data/receipts", exist_ok=True)
 os.makedirs("backend/uploads/landing", exist_ok=True)
-app.mount("/data", StaticFiles(directory="data"), name="data")
-app.mount("/uploads", StaticFiles(directory="backend/uploads"), name="uploads")
-app.mount("/public", StaticFiles(directory="public"), name="public") # Also mount public for background images
 
-# Enable CORS for production
+if os.path.exists("data"):
+    app.mount("/data", StaticFiles(directory="data"), name="data")
+if os.path.exists("backend/uploads"):
+    app.mount("/uploads", StaticFiles(directory="backend/uploads"), name="uploads")
+if os.path.exists("public"):
+    app.mount("/public", StaticFiles(directory="public"), name="public")
+
+# Enable CORS for production - more permissive for debugging
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=False, # Set to False for allow_origins=["*"]
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
-    expose_headers=["*"]
 )
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
