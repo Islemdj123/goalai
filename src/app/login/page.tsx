@@ -29,7 +29,11 @@ export default function Login() {
       }
     } catch (err) {
       console.error("Login connection error:", err);
-      alert("Could not connect to server. Please ensure the backend is running at http://localhost:8000");
+      if (API_BASE.includes("your-backend-link")) {
+        alert("خطأ: لم يتم ضبط رابط الـ Backend بعد. يرجى تحديث الملف src/lib/api.ts برابط Render الخاص بك.");
+      } else {
+        alert("تعذر الاتصال بالسيرفر. تأكد من أن الـ Backend في Render يعمل بشكل صحيح.");
+      }
     }
   };
 
