@@ -29,11 +29,7 @@ export default function Login() {
       }
     } catch (err) {
       console.error("Login connection error:", err);
-      if (API_BASE.includes("your-backend-link")) {
-        alert("خطأ: لم يتم ضبط رابط الـ Backend بعد. يرجى تحديث الملف src/lib/api.ts برابط Render الخاص بك.");
-      } else {
-        alert("تعذر الاتصال بالسيرفر. تأكد من أن الـ Backend في Render يعمل بشكل صحيح.");
-      }
+      alert("تعذر الاتصال بالسيرفر. تأكد من أن الـ Backend في Render يعمل بشكل صحيح.");
     }
   };
 
