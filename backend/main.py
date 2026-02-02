@@ -16,6 +16,10 @@ models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="AI Football Predictor API")
 
+@app.get("/")
+def health_check():
+    return {"status": "alive", "service": "GoalAI API"}
+
 @app.middleware("http")
 async def remove_api_prefix(request, call_next):
     if request.url.path.startswith("/api"):
